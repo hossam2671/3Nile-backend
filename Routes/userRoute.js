@@ -102,7 +102,7 @@ route.get("/category/3nileplus/boats", async (req, res) => {
 
 //get all boats in category 3
 route.get("/category/3nilevip/boats", async (req, res) => {
-  const thiCatBoats = await boats.find({ category: "3nilevip" });
+  const thiCatBoats = await boats.find({ category: "3nile vip" });
   res.send(thiCatBoats);
 });
 
