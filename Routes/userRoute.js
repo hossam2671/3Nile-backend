@@ -39,6 +39,10 @@ route.post("/userRegister", async function (req, res) {
   });
   res.send("data registered");
 });
+// Muter Images End 
+
+
+
 
 // Log In :
 route.post("/userLogin", async (req, res) => {
@@ -244,4 +248,44 @@ route.get("/boats/top-rated", async (req, res) => {
   }
 });
 
+
+
+// Top RAted Boats  : 
+
+
+
+route.get("/boats/top-rated", async (req, res) => {
+  try {
+    const topRatedBoats = await boats.aggregate([
+      {
+        // Join with the Review collection to get the average rating
+        $lookup: {
+          from: "reviews",
+          localField: "_id",
+          foreignField: "boatId",
+          as: "reviews",
+        },
+      },
+      {
+        // Calculate the average rating
+        $addFields: {
+          averageRating: { $avg: "$reviews.rating" },
+        },
+      },
+      {
+        // Sort by average rating in descending order
+        $sort: {
+          averageRating: -1,
+        },
+      },
+      {
+        // Limit to the top 10 boats
+        $limit: 5,
+      },
+    ]);
+    res.send(topRatedBoats);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 module.exports = route;
