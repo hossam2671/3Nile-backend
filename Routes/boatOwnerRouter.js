@@ -19,15 +19,17 @@ route.use(cookieParser());
 
 // multter img 
 
-const fileStorage = multer.diskStorage({
-  destination: (req, file, callbackfun) => {
-    callbackfun(null, "./uploads");
+const storage = multer.diskStorage({
+  destination: function (req, file, callbackfunction) {
+    callbackfunction(null, 'uploads')
   },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + file.originalname.replaceAll(" ", ""));
-  },
+
+  filename: function (req, file, callbackfunction) {
+    callbackfunction(null, file.originalname)
+  }
 });
-const upload = multer({ storage: fileStorage });
+
+const upload = multer({ storage: storage });
 route.use(cookieParser());
 
 // Register :
@@ -132,27 +134,36 @@ route.get("/getAllBoats:id", async function (req, res) {
 
 // add Boat
 route.post("/addBoat",
-  upload.single("image"),
+  upload.array("images", 10),
   async function (req, res) {
-    console.log(req.body);
-    let boatData = await boat.create({
-      name: req.body.name,
-      description: req.body.description,
-      price: req.body.price,
-      portName: req.body.portName,
-      type: req.body.type,
-      numberOfpeople: req.body.numberOfpeople,
-      // imgUrl: req.file.path,
-      //  images: req.body.images,
-      // 'img':req.body.img
-    });
-    console.log(req.file)
-    let boatOwnerId = jwt.verify(req.cookies.boatOwnerId, "3-nile");
-    let boatOwnerData = await boatOwner.findByIdAndUpdate(boatOwnerId.boatOwner, {
-      $push: { boat: boatData._id },
-    });
-    res.send("Added");
-  });
+    console.log(req.files)
+    try {
+
+      if (req.files === undefined) {
+        res.status(400).send('No files were uploaded.');
+        return;
+      }
+
+      let multiimages = req.files.map((file) => file.filename);
+      // console.log(multiimages)
+
+      let boatData = await boat.create({
+        name: req.body.name,
+        description: req.body.description,
+        price: req.body.price,
+        portName: req.body.portName,
+        type: req.body.type,
+        numberOfpeople: req.body.numberOfpeople,
+        images: multiimages,
+      });
+
+      res.send(boatData);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Error adding boat!');
+    }
+  }
+);
 
 // delete boat
 route.delete("/deleteBoat", async function (req, res) {
