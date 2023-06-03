@@ -58,7 +58,7 @@ route.post("/userLogin", async (req, res) => {
         res.send(userData);
       } else {
         res.send("Invalid Password");
-      } 
+      }
     }
   } catch (err) {
     res.status(401).json({ error: err.message });
@@ -70,15 +70,15 @@ route.get("/editUserinfo", async function (req, res) {
   let editUserinfo = await user.findById(req.body.id);
   res.send(editUserinfo);
 });
-route.put("/editUserinfo", 
-upload.single("image"),
-async function (req, res) {
-  let editUserinfo = await user.findByIdAndUpdate(req.body.id,{
-    name: req.body.name,
-    img: req.file.path,
+route.put("/editUserinfo",
+  upload.single("image"),
+  async function (req, res) {
+    let editUserinfo = await user.findByIdAndUpdate(req.body.id, {
+      name: req.body.name,
+      img: req.file.path,
+    });
+    res.send("done");
   });
-  res.send("done");
-});
 
 //get all boats
 route.get("/boats", async (req, res) => {
@@ -108,71 +108,80 @@ route.get("/category/3nilevip/boats", async (req, res) => {
 
 // Get One Boat : description Page
 route.get('/boat', async (req, res) => {
-  const boatData = await boats.findById(req.body.id)
-  res.send(boatData); 
- })
+  const boatData = await boats.findById(req.body.boatId)
+  try {
+    const numOfReviews = await reviews.find({ boatId: req.body.boatId });
+    const totalReviews = numOfReviews.length
+    const totalRating = numOfReviews.reduce((sum, review) => sum + review.rating, 0);
+    const averageRating = totalRating / numOfReviews.length;
+    res.status(200).json({ totalReviews, averageRating, boatData });
+    // res.send({averageRating})
+  } catch (error) {
+    res.status(500).json({ message: 'Something went wrong.' });
+  }
+})
 
 // aDD tRIP
- route.post('/addTrip',async(req, res) => {
+route.post('/addTrip', async (req, res) => {
   // res.send(req.cookies)
-   let id = jwt.verify(req.cookies.userId, "3-nile");
-   const boatData =  await boats.findById(req.body.id)
-   const tripData = await trips.create({
-     boatId: req.body.id,
+  let id = jwt.verify(req.cookies.userId, "3-nile");
+  const boatData = await boats.findById(req.body.id)
+  const tripData = await trips.create({
+    boatId: req.body.id,
     //  price:boatData.price*req.body.hours,
-     hours:req.body.hours,
+    hours: req.body.hours,
     //  startTime:req.body.startTime,
     //  date:req.body.date,
-     clienId:id,
-     status:"pending"
-   })
-   res.send(boatData)
- })
-
- // cancel trip
-route.put('/cancelTrip',async(req, res) =>{
-const tripData = await trips.findByIdAndUpdate(req.body.id,{
- status:"cancelled"
+    clienId: id,
+    status: "pending"
+  })
+  res.send(boatData)
 })
-res.send("cancelled")
+
+// cancel trip
+route.put('/cancelTrip', async (req, res) => {
+  const tripData = await trips.findByIdAndUpdate(req.body.id, {
+    status: "cancelled"
+  })
+  res.send("cancelled")
 })
 
 // fininsh trip
-route.put('/finishTrip',async(req, res) =>{
-const tripData = await trips.findByIdAndUpdate(req.body.id,{
- status:"finished"
-})
-res.send("finished")
+route.put('/finishTrip', async (req, res) => {
+  const tripData = await trips.findByIdAndUpdate(req.body.id, {
+    status: "finished"
+  })
+  res.send("finished")
 })
 
 
 // get all user trips
 
 route.get('/userTrips', async (req, res) => {
-let id = jwt.verify(req.cookies.userId, "3-nile");
-const userTrips = await trips.find({clienId:id})
-res.send(userTrips)
+  let id = jwt.verify(req.cookies.userId, "3-nile");
+  const userTrips = await trips.find({ clienId: id })
+  res.send(userTrips)
 })
 // get all user finished trips
 
 route.get('/userTrips/finished', async (req, res) => {
-let id = jwt.verify(req.cookies.userId, "3-nile");
-const userTrips = await trips.find({clienId:id , status:"finished"})
-res.send(userTrips)
+  let id = jwt.verify(req.cookies.userId, "3-nile");
+  const userTrips = await trips.find({ clienId: id, status: "finished" })
+  res.send(userTrips)
 })
 // get all user pending trips
 
 route.get('/userTrips/pending', async (req, res) => {
-let id = jwt.verify(req.cookies.userId, "3-nile");
-const userTrips = await trips.find({clienId:id , status:"pending"})
-res.send(userTrips)
+  let id = jwt.verify(req.cookies.userId, "3-nile");
+  const userTrips = await trips.find({ clienId: id, status: "pending" })
+  res.send(userTrips)
 })
 
 // get all user accepted trips
 route.get('/userTrips/accepted', async (req, res) => {
-let id = jwt.verify(req.cookies.userId, "3-nile");
-const userTrips = await trips.find({clienId:id , status:"accepted"})
-res.send(userTrips)
+  let id = jwt.verify(req.cookies.userId, "3-nile");
+  const userTrips = await trips.find({ clienId: id, status: "accepted" })
+  res.send(userTrips)
 })
 
 
@@ -180,7 +189,7 @@ res.send(userTrips)
 // Create a new review
 route.post("/addReview", async (req, res) => {
   try {
-    const findTrip= await reviews.find({tripId: req.body.tripId});
+    const findTrip = await reviews.find({ tripId: req.body.tripId });
     // if(findTrip){
 
     // }else
