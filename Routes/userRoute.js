@@ -119,10 +119,10 @@ route.get('/boat', async (req, res) => {
    const boatData =  await boats.findById(req.body.id)
    const tripData = await trips.create({
      boatId: req.body.id,
-     price:boatData.price*req.body.hours,
+    //  price:boatData.price*req.body.hours,
      hours:req.body.hours,
-     startTime:req.body.startTime,
-     date:req.body.date,
+    //  startTime:req.body.startTime,
+    //  date:req.body.date,
      clienId:id,
      status:"pending"
    })

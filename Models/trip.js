@@ -5,7 +5,7 @@ const tripSchema=mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,ref:"boats",
         },
     price:{
-        required:true,
+        // required:true,
         type:Number,
         },
     startTime:{

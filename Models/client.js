@@ -19,7 +19,7 @@ const clientschema=mongoose.Schema({
     },
     phone:{
         type:"string",
-        default:"+2sqs0"
+        default:"+2sqs000"
         // require:true,
         // unique:true,
     },
