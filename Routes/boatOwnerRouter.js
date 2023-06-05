@@ -127,7 +127,7 @@ route.get("/getAllBoats:id", async function (req, res) {
 
 // add Boat
 route.post("/addBoat",
-  upload.array("images", 10),
+  upload.array("images", 9),
   async function (req, res) {
     console.log(req.files)
     try {

@@ -39,9 +39,9 @@ route.post("/register", upload.single("image"), async function (req, res) {
     email: req.body.email,
     password: req.body.password,
     // 'img':req.body.img
-    img: req.file.path,
+    // img: req.file.path,
   });
-  res.send("data registered");
+  res.send("wata registered");
 });
 // Log In :
 route.post("/login", async (req, res) => {
@@ -58,7 +58,8 @@ route.post("/login", async (req, res) => {
               const token = jwt.sign({ admin: adminData._id }, "3-nile");
               // Set The Id In Cookie With Encryption
               res.cookie("adminId", token, { maxAge: 900000, httpOnly: true });
-              res.send("Logged")
+              res.send(adminData)
+              
             }else{
                 res.send("Invalid Password")
             }
