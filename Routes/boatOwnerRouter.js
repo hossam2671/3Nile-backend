@@ -3,6 +3,7 @@ const route = express.Router();
 const boat = require("../Models/boat");
 const trips = require("../Models/trip");
 const boatOwner = require("../Models/boatOwner");
+const reviews = require("../Models/Offer");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -18,31 +19,34 @@ route.use(cookieParser());
 
 // multter img 
 
-const fileStorage = multer.diskStorage({
-  destination: (req, file, callbackfun) => {
-    callbackfun(null, "./uploads");
+const storage = multer.diskStorage({
+  destination: function (req, file, callbackfunction) {
+    callbackfunction(null, 'uploads')
   },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + file.originalname.replaceAll(" ", ""));
-  },
+
+  filename: function (req, file, callbackfunction) {
+    callbackfunction(null, file.originalname)
+  }
 });
-const upload = multer({ storage: fileStorage });
+
+const upload = multer({ storage: storage });
 route.use(cookieParser());
 
 // Register :
 route.post("/register",
-async (req, res)=> {
-  const hashedPassword = await bcrypt.hash(req.body.password, 10);
-  req.body.password = hashedPassword;
-  let boatOwnerData = await boatOwner.create({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    // imgUrl: req.file.filename,
-    // 'img':req.body.img
+  upload.single("image"),
+  async function (req, res) {
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    req.body.password = hashedPassword;
+    let boatOwnerData = await boatOwner.create({
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      // imgUrl: req.file.filename,
+      // 'img':req.body.img
+    });
+    res.send("data registered");
   });
-  res.send("data registered");
-});
 
 // Log In :
 route.post("/login", async (req, res) => {
@@ -73,7 +77,7 @@ route.post("/login", async (req, res) => {
 //   Get BoutOwner Data  :
 route.get("/getData", async function (req, res) {
   let boatOwnerId = jwt.verify(req.cookies.boatOwnerId, "3-nile");
-  
+
 
 
 
@@ -109,7 +113,7 @@ route.put('/updateData/:id', async function (req, res) {
       updatedData,
       { new: true }
     );
-      console.log("Data updated");
+    console.log("Data updated");
     res.status(200).send(result);
   } catch (error) {
     res.status(400).send(error.message);
@@ -129,28 +133,37 @@ route.get("/getAllBoats:id", async function (req, res) {
 });
 
 // add Boat
-route.post("/addBoat", 
-upload.single("image"),
- async function (req, res) {
-  console.log(req.body);
-  let boatData = await boat.create({
-    name: req.body.name,
-    description: req.body.description,
-    price: req.body.price,
-    portName: req.body.portName,
-    type: req.body.type,
-    numberOfpeople: req.body.numberOfpeople,
-    imgUrl: req.file.path,
-  //  images: req.body.images,
-    // 'img':req.body.img
-  });
-  console.log(req.file)
-  let boatOwnerId = jwt.verify(req.cookies.boatOwnerId, "3-nile");
-  let boatOwnerData = await boatOwner.findByIdAndUpdate(boatOwnerId.boatOwner, {
-    $push: { boat: boatData._id },
-  });
-  res.send("Added");
-});
+route.post("/addBoat",
+  upload.array("images", 10),
+  async function (req, res) {
+    console.log(req.files)
+    try {
+
+      if (req.files === undefined) {
+        res.status(400).send('No files were uploaded.');
+        return;
+      }
+
+      let multiimages = req.files.map((file) => file.filename);
+      // console.log(multiimages)
+
+      let boatData = await boat.create({
+        name: req.body.name,
+        description: req.body.description,
+        price: req.body.price,
+        portName: req.body.portName,
+        type: req.body.type,
+        numberOfpeople: req.body.numberOfpeople,
+        images: multiimages,
+      });
+
+      res.send(boatData);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Error adding boat!');
+    }
+  }
+);
 
 // delete boat
 route.delete("/deleteBoat", async function (req, res) {
@@ -184,19 +197,19 @@ route.get("/getOneBoat", async function (req, res) {
   res.send(boatData);
 });
 
-route.put("/editBoat", 
-upload.single("image"),
-async function (req, res) {
-  let boatData = await boat.findByIdAndUpdate(req.body.id, {
-    name: req.body.name,
-    description: req.body.description,
-    price: req.body.price,
-    portName: req.body.portName,
-    imgUrl: req.file.path,
-    //   images: req.body.images,
+route.put("/editBoat",
+  upload.single("image"),
+  async function (req, res) {
+    let boatData = await boat.findByIdAndUpdate(req.body.id, {
+      name: req.body.name,
+      description: req.body.description,
+      price: req.body.price,
+      portName: req.body.portName,
+      imgUrl: req.file.path,
+      //   images: req.body.images,
+    });
+    res.send("done");
   });
-  res.send("done");
-});
 
 // get All trips
 route.get("/getAllTrips", async function (req, res) {
@@ -227,6 +240,31 @@ route.get("/getAllTrips", async function (req, res) {
   res.send(data);
 });
 
+
+// Get Boat trips By BoatId 
+route.get('/BoatTrip', async (req, res) => {
+
+    let trip = await trips.find({boatId: req.body.boatId})
+    console.log(trip.length);
+    res.send({length:trip.length})
+    
+});
+
+
+// Get avg rate for one boat
+// route.get('/BoatAvgRate',async (req, res) => {
+//   const { boutId } = req.body;
+//   try {
+//     const review = await reviews.find({ boutId });
+//     const totalRating = review.reduce((sum, review) => sum + review.rating, 0);
+//     const averageRating = totalRating / review.length;
+//     res.status(200).json({ averageRating });
+//     // res.send({averageRating})0
+//   } catch (error) {
+//     res.status(500).json({ message: 'Something went wrong.' });
+//   }
+// })
+//
 // get Trips -->> Status
 // uPDATE tRIP STATUS : aCCEPTED , FINISHED , PENDING
 module.exports = route;
