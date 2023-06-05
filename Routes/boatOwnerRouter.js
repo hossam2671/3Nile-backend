@@ -31,10 +31,9 @@ route.use(cookieParser());
 
 // Register :
 route.post("/register",
-upload.single("image"),
-async function (req, res) {
-  // const hashedPassword = await bcrypt.hash(req.body.password, 10);
-  // req.body.password = hashedPassword;
+async (req, res)=> {
+  const hashedPassword = await bcrypt.hash(req.body.password, 10);
+  req.body.password = hashedPassword;
   let boatOwnerData = await boatOwner.create({
     name: req.body.name,
     email: req.body.email,

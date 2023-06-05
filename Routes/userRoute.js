@@ -27,21 +27,22 @@ const fileStorage = multer.diskStorage({
 const upload = multer({ storage: fileStorage });
 route.use(cookieParser());
 // Register :
-route.post("/userRegister", async function (req, res) {
-  console.log(req.body);
+route.post("/register", async function (req, res) {
+  
+
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
   req.body.password = hashedPassword;
   let userData = await user.create({
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
-    // 'img':req.body.img
+  //   // 'img':req.body.img
   });
   res.send("data registered");
 });
 
 // Log In :
-route.post("/userLogin", async (req, res) => {
+route.post("/login", async (req, res) => {
   try {
     const userData = await user.findOne({ email: req.body.email });
     if (!userData) {

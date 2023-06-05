@@ -2,14 +2,14 @@ const mongoose = require('mongoose');
 const clientschema=mongoose.Schema({
    name:{
     type:"string",
-    min:3,
-    max:25,
+    // min:3,
+    // max:25,
     require:true
     },
     
     email:{
     type:"string",
-    require:true,
+    // require:true,
     // unique:true,
     },
     address:{
@@ -19,7 +19,7 @@ const clientschema=mongoose.Schema({
     },
     phone:{
         type:"string",
-        default:"+2sqs0"
+        default:"01206150854"
         // require:true,
         // unique:true,
     },
@@ -29,8 +29,8 @@ const clientschema=mongoose.Schema({
     passwod:{
         type:"string",
         // require:true,
-        min:8,
-        max:30,
+        // min:8,
+        // max:30,
     },
     status:{
         // required:true, 

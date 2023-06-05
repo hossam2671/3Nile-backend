@@ -2,19 +2,19 @@ const mongoose = require("mongoose")
 const ownerSchema = mongoose.Schema({
     name:{
         type: String,
-        required: true,
-        minLength:3,
-        maxLength: 25,
+        // required: true,
+        // minLength:3,
+        // maxLength: 25,
     },
     email:{
         type: String,
-        required: true,
-        unique:true,
+        // required: true,
+        // unique:true,
     },
     password:{
         type: String,
-        required: true,
-        minLength:8,
+        // required: true,
+        // minLength:8,
         // maxLength: 30,
     },
     phone:{
@@ -38,7 +38,7 @@ const ownerSchema = mongoose.Schema({
         maxLength: 50,
     },
     status:{
-        required:true, 
+       
         type: String,
         enum: ['pending', 'accepted'],
         default:'pending'

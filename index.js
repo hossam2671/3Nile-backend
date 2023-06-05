@@ -4,11 +4,12 @@ require("./config/connection");
 // Call Packages 
 const express = require("express");
 const cors = require("cors");
-
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 //  Call Modules -- >> Schemas
 const Admin = require("./Models/admin");
 const boatOwner = require("./Models/boatOwner");
-const client = require("./Models/client");
+const user = require("./Models/client");
 const boat = require("./Models/boat");
 const trip = require("./Models/trip");
 const review = require("./Models/review");
@@ -52,7 +53,59 @@ server.listen(5000,function()
 {
     console.log("listen");
 })
+// 
 
+app.post("/login", async (req, res) => {
+  try {
+    const boatOwnerData = await boatOwner.findOne({ email: req.body.email });
+    if (!boatOwnerData) {
+    
+      try {
+        const userData = await user.findOne({ email: req.body.email });
+        if (!userData) {
+          res.status(401).json({ error: "Invalid credentials" });
+        } else {
+          const isValidPassword = await bcrypt.compare(
+            req.body.password,
+            userData.password
+          );
+          if (isValidPassword) {
+            const token = jwt.sign({ user: userData._id }, "3-nile");
+            // Set The Id In Cookie With Encryption
+            res.cookie("userId", token, { maxAge: 900000, httpOnly: true });
+            let user = 'user'
+            res.send({userData,user});
+          } else {
+            res.send("Invalid Password");
+          } 
+        }
+      } catch (err) {
+        res.status(401).json({ error: err.message });
+      }
+ 
+    } else {
+      const isValidPassword = await bcrypt.compare(
+        req.body.password,
+        boatOwnerData.password
+      );
+      if (isValidPassword) {
+        const token = jwt.sign({ boatOwner: boatOwnerData._id }, "3-nile");
+        //   console.log(boatOwnerData._id)
+        // Set The Id In Cookie With Encryption
+        res.cookie("boatOwnerId", token, { maxAge: 9000000, httpOnly: true });
+        let boatOwner = 'boatOwner'
+        res.send({boatOwnerData,boatOwner});
+      } else {
+        res.send("Invalid Password");
+      }
+    }
+  } catch (err) {
+    res.status(401).json({ error: err.message });
+  }
+});
+
+
+// 
 
 app.post("/register", async function (req, res) {
     let ownerData = await boatOwner.create({
