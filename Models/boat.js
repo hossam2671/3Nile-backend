@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 const boatSchema = mongoose.Schema({
     name: {
         type: String,
-        required: true,
+        // required: true,
         maxLength: 30
     },
     description: {
         type: String,
-        required: true,
+        // required: true,
         mminLength: 100,
         maxLength: 400
     },
@@ -17,7 +17,7 @@ const boatSchema = mongoose.Schema({
     },
     price: {
         type: Number,
-        required: true,
+        // required: true,
     },
     portName: {
         type: String,
@@ -35,7 +35,7 @@ const boatSchema = mongoose.Schema({
     },
     numberOfpeople: {
         type: Number,
-        required: true,
+        // required: true,
     },
     status:{
         // required:true, 

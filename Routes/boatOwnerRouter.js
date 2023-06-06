@@ -76,18 +76,11 @@ route.post("/login", async (req, res) => {
 
 //   Get BoutOwner Data  :
 route.get("/getData", async function (req, res) {
-  let boatOwnerId = jwt.verify(req.cookies.boatOwnerId, "3-nile");
+  // let boatOwnerId = jwt.verify(req.cookies.boatOwnerId, "3-nile");
+    let boatOwnerId = '646d1b59ad57a49acc35b872'; 
 
-
-
-
-
-
-
-  // // console.log(adminID);
-  // // let adminData = await admin.findById(adminID.admin)
-  // // console.log(adminData);
-  let boatOwnerData = await boatOwner.findById(boatOwnerId.boatOwner);
+  let boatOwnerData = await boatOwner.findById(boatOwnerId);
+  // let boatOwnerData = await boatOwner.findById(boatOwnerId.boatOwner);
   console.log(boatOwnerData);
   res.send(boatOwnerData);
 });
@@ -138,26 +131,28 @@ route.post("/addBoat",
   async function (req, res) {
     console.log(req.files)
     try {
-
       if (req.files === undefined) {
         res.status(400).send('No files were uploaded.');
         return;
       }
-
       let multiimages = req.files.map((file) => file.filename);
       // console.log(multiimages)
-
       let boatData = await boat.create({
         name: req.body.name,
         description: req.body.description,
         price: req.body.price,
         portName: req.body.portName,
         type: req.body.type,
-        numberOfpeople: req.body.numberOfpeople,
+        numberOfpeople: req.body.number,
         images: multiimages,
       });
+      // let boatOwnerId = jwt.verify(req.cookies.boatOwnerId, "3-nile");
+      let boatOwnerId = '646d225031823a799fb95c7b';
+      let boatOwnerData = await boatOwner.findByIdAndUpdate(boatOwnerId, {
+        $push: { boat: boatData._id },
+      });
 
-      res.send(boatData);
+      res.send(boatOwnerData);
     } catch (err) {
       console.error(err);
       res.status(500).send('Error adding boat!');

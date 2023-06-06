@@ -112,10 +112,10 @@ route.get("/category/3nilevip/boats", async (req, res) => {
 });
 
 // Get One Boat : description Page
-route.get('/boat', async (req, res) => {
-  const boatData = await boats.findById(req.body.boatId)
+route.get('/boat/:id', async (req, res) => {
+  const boatData = await boats.findById(req.params.id)
   try {
-    const numOfReviews = await reviews.find({ boatId: req.body.boatId });
+    const numOfReviews = await reviews.find({ boatId: req.params.id });
     const totalReviews = numOfReviews.length
     const totalRating = numOfReviews.reduce((sum, review) => sum + review.rating, 0);
     const averageRating = totalRating / numOfReviews.length;

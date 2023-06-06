@@ -24,6 +24,7 @@ const adminRoute=require('./Routes/adminRouter')
 // calling express and use it to use middlewares
 const app = express();
 app.use(cors());
+app.use(express.static('uploads'))
 
 const server = require('http').createServer(app)
 
