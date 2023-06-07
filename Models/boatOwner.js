@@ -22,7 +22,7 @@ const ownerSchema = mongoose.Schema({
         // required: true,
         // unique:true,
     },
-    imgUrl:{
+    img:{
         type:String,
     },
     boat:

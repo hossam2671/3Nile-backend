@@ -16,8 +16,7 @@ route.use(express.static(path.join(__dirname, "./uploads")));
 route.use(express.static("./uploads"));
 route.use(cors())
 route.use(cookieParser());
-
-// multter img 
+const io = require('../index');// multter img 
 
 const storage = multer.diskStorage({
   destination: function (req, file, callbackfunction) {
@@ -74,16 +73,8 @@ route.post("/login", async (req, res) => {
   }
 });
 
-//   Get BoutOwner Data  :
-route.get("/getData", async function (req, res) {
-  // let boatOwnerId = jwt.verify(req.cookies.boatOwnerId, "3-nile");
-    let boatOwnerId = '646d1b59ad57a49acc35b872'; 
 
-  let boatOwnerData = await boatOwner.findById(boatOwnerId);
-  // let boatOwnerData = await boatOwner.findById(boatOwnerId.boatOwner);
-  console.log(boatOwnerData);
-  res.send(boatOwnerData);
-});
+
 
 
 // TEstttt --> React
@@ -96,7 +87,35 @@ route.get("/getData:id", async function (req, res) {
   console.log(boatOwnerData);
   res.send(boatOwnerData);
 });
-route.put('/updateData/:id', async function (req, res) {
+
+
+// 
+
+
+route.put('/updateData/:id', upload.single('image'), async function (req, res) {
+  try {
+    const boatOwnerId = req.params.id;
+    const updatedData = req.body;
+
+    if (req.file) { // check if an image file was uploaded
+      updatedData.img = req.file.filename; // add the file path to the updated data object
+    }
+
+    const result = await boatOwner.findByIdAndUpdate(
+      boatOwnerId,
+      updatedData,
+      { new: true }
+    );
+    console.log(result,"anasHossam@gmail.com");
+    console.log("Data updated");
+    res.status(200).send(result);
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
+// 
+
+route.put('/updateDataa/:id', async function (req, res) {
   try {
     const boatOwnerId = req.params.id;
     const updatedData = req.body;
@@ -114,7 +133,7 @@ route.put('/updateData/:id', async function (req, res) {
 });
 
 // get All His boats
-route.get("/getAllBoats:id", async function (req, res) {
+route.get("/getAllBoats/:id", async function (req, res) {
   const boatOwnerId = req.params.id;
   let boatOwnerData = await boatOwner.findById(boatOwnerId);
   let data = [];
@@ -129,7 +148,9 @@ route.get("/getAllBoats:id", async function (req, res) {
 route.post("/addBoat",
   upload.array("images", 9),
   async function (req, res) {
+    // console.log(req.cookies.boatOwnerId);
     console.log(req.files)
+    console.log(req.body.boatOwnerId);
     try {
       if (req.files === undefined) {
         res.status(400).send('No files were uploaded.');
@@ -146,12 +167,12 @@ route.post("/addBoat",
         numberOfpeople: req.body.number,
         images: multiimages,
       });
-      // let boatOwnerId = jwt.verify(req.cookies.boatOwnerId, "3-nile");
-      let boatOwnerId = '646d225031823a799fb95c7b';
-      let boatOwnerData = await boatOwner.findByIdAndUpdate(boatOwnerId, {
+      // let boatOwnerId = req.cookies.boatOwnerId
+      // let boatOwnerId = '646d225031823a799fb95c7b';
+      let boatOwnerData = await boatOwner.findByIdAndUpdate(req.body.boatOwnerId, {
         $push: { boat: boatData._id },
       });
-
+          
       res.send(boatOwnerData);
     } catch (err) {
       console.error(err);
@@ -161,28 +182,34 @@ route.post("/addBoat",
 );
 
 // delete boat
-route.delete("/deleteBoat", async function (req, res) {
-  let boatData = await boat.findByIdAndDelete(req.body.id);
-  let boatOwnerId = jwt.verify(req.cookies.boatOwnerId, "3-nile");
-  let boatOwnerData = await boatOwner.findById(boatOwnerId.boatOwner);
+route.delete("/deleteBoat/:id/:ownerId", async function (req, res) {
+console.log(req.params);
+  let boatData = await boat.findByIdAndDelete(req.params.id);
+  // let boatOwnerId = jwt.verify(req.cookies.boatOwnerId, "3-nile");
+  let boatOwnerData = await boatOwner.findById(req.params.ownerId);
+
   // let data =[]
+  let updateBoats;
   for (let i = 0; i < boatOwnerData.boat.length; i++) {
-    if (boatOwnerData.boat[i] == req.body.id) {
+    if (boatOwnerData.boat[i] == req.params.id) {
       boatOwnerData.boat.splice(i, 1);
-      let updateBoats = await boatOwner.findByIdAndUpdate(
-        boatOwnerId.boatOwner,
+      console.log(boatOwnerData.boat);
+      updateBoats  = await boatOwner.findByIdAndUpdate(
+        req.params.ownerId,
         {
           boat: boatOwnerData.boat,
-        }
+        },
+        {new:true}
       );
     }
   }
-  res.send(boatOwnerData.boat);
+  console.log(boatOwnerData);
+  res.send(boatOwnerData);
 });
 //get One Boat
 
 route.get("/getOneBoat", async function (req, res) {
-  let boatData = await boat.findById(req.body.id);
+  let boatData = await boat.findById(req.body.boatId);
   res.send(boatData);
 });
 
@@ -192,16 +219,18 @@ route.get("/getOneBoat", async function (req, res) {
   res.send(boatData);
 });
 
-route.put("/editBoat",
-  upload.single("image"),
+route.put("/editBoat/:id",
+upload.array("images", 9),
   async function (req, res) {
-    let boatData = await boat.findByIdAndUpdate(req.body.id, {
+    console.log(req.files);
+    let multiimages = req.files.map((file) => file.filename);
+    let boatData = await boat.findByIdAndUpdate(req.params.id, {
       name: req.body.name,
       description: req.body.description,
       price: req.body.price,
-      portName: req.body.portName,
-      imgUrl: req.file.path,
-      //   images: req.body.images,
+      numberOfpeople: req.body.number,
+      images: multiimages,
+     
     });
     res.send("done");
   });
@@ -215,6 +244,63 @@ route.get("/getAllTrips", async function (req, res) {
   });
 
   let tripData = await trips.find({}).populate({
+    path: "boatId",
+    model: "boats",
+  });
+  let data = [];
+  for (let i = 0; i < boatOwnerData.boat.length; i++) {
+    for (let j = 0; j < tripData.length; j++) {
+      let tripdatad = tripData[j].boatId;
+      let ownerb = boatOwnerData.boat[i];
+      if (JSON.stringify(tripdatad) === JSON.stringify(ownerb)) {
+        console.log("matched");
+        data.push(tripdatad);
+      } else {
+        console.log(ownerb);
+      }
+    }
+  }
+
+  res.send(data);
+});
+// get All Pending trips
+route.get("/getAllPendingTrips/:id", async function (req, res) {
+  console.log(req.params.id);
+  const boatOwnerId = req.params.id
+  let boatOwnerData = await boatOwner.findById(boatOwnerId).populate({
+    path: "boat",
+    model: "boats",
+  });
+
+  let tripData = await trips.find({status:'pending'}).populate({
+    path: "boatId",
+    model: "boats",
+  });
+  let data = [];
+  for (let i = 0; i < boatOwnerData.boat.length; i++) {
+    for (let j = 0; j < tripData.length; j++) {
+      let tripdatad = tripData[j].boatId;
+      let ownerb = boatOwnerData.boat[i];
+      if (JSON.stringify(tripdatad) === JSON.stringify(ownerb)) {
+        console.log("matched");
+        data.push(tripdatad);
+      } else {
+        console.log(ownerb);
+      }
+    }
+  }
+
+  res.send(data);
+});
+// Get Previous Trips
+route.get("/getAllFinishedTrips/:id", async function (req, res) {
+  const boatOwnerId = req.params.id
+  let boatOwnerData = await boatOwner.findById(boatOwnerId).populate({
+    path: "boat",
+    model: "boats",
+  });
+
+  let tripData = await trips.find({status:'finished'}).populate({
     path: "boatId",
     model: "boats",
   });

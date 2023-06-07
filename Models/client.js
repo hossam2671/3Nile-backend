@@ -20,7 +20,7 @@ const clientschema=mongoose.Schema({
     },
     phone:{
         type:"string",
-        default:"01206150854"
+        default:"0124854"
         // require:true,
         // unique:true,
     },
