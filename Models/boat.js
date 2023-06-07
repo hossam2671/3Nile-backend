@@ -33,7 +33,7 @@ const boatSchema = mongoose.Schema({
             values: ["shera3", "", "", "", "", ""],
         },
     },
-    numberOfpeople: {
+    numberOfPeople: {
         type: Number,
         // required: true,
     },
