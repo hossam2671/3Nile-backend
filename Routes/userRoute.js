@@ -1,5 +1,5 @@
 const express = require("express");
-const  io  = require('../index');
+const  io  = require('../Socket').get();
 const route = express.Router();
 const user = require("../Models/client");
 const boats = require("../Models/boat");
@@ -16,6 +16,10 @@ route.use(express.static("./uploads"));
 route.use(cors())
 route.use(cookieParser());
 // multter img 
+// io.on('connection',(socket)=>{
+//   console.log("new User Connectedd");
+
+// })
 const fileStorage = multer.diskStorage({
   destination: (req, file, callbackfun) => {
     callbackfun(null, "./uploads");
@@ -72,6 +76,7 @@ route.post("/login", async (req, res) => {
 
 // edit user info 
 route.get("/editUserinfo", async function (req, res) {
+ 
   let editUserinfo = await user.findById(req.body.id);
   res.send(editUserinfo);
 });
@@ -145,7 +150,13 @@ route.post('/addTrip/:boatId/:clienId', async (req, res) => {
     clienId: req.params.clienId,
     status: "pending"
   })
-  res.send(boatData)
+
+
+
+// Socket
+  let tripNotification = "You Got A New Trip Request"
+  io.emit('You-Got-New-Trip-Request', {tripData,tripNotification});
+  res.send(tripData)
 })
 
 // cancel trip
@@ -153,15 +164,29 @@ route.put('/cancelTrip', async (req, res) => {
   const tripData = await trips.findByIdAndUpdate(req.body.id, {
     status: "cancelled"
   })
-  res.send("cancelled")
+  const tripInformation = await trips.findById(req.body.id )
+
+ let tripNotification = "The Trip Canceleld Now "
+  io.emit('User-Cancel-Trip', {tripInformation,tripNotification});
+
+  res.send(tripInformation)
 })
+
+
+
+
 
 // fininsh trip
 route.put('/finishTrip', async (req, res) => {
   const tripData = await trips.findByIdAndUpdate(req.body.id, {
     status: "finished"
   })
-  res.send("finished")
+
+  const tripInformation = await trips.findById(req.body.id )
+
+  let tripNotification = "Client Has Finished The Trip "
+   io.emit('User-Finish-Trip', {tripInformation,tripNotification});
+  res.send(tripInformation)
 })
 
 
