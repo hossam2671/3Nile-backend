@@ -1,4 +1,5 @@
 const express = require("express");
+const  io  = require('../Socket').get();
 const route = express.Router();
 const boat = require("../Models/boat");
 const trips = require("../Models/trip");
@@ -16,7 +17,8 @@ route.use(express.static(path.join(__dirname, "./uploads")));
 route.use(express.static("./uploads"));
 route.use(cors())
 route.use(cookieParser());
-const io = require('../index');// multter img 
+
+
 
 const storage = multer.diskStorage({
   destination: function (req, file, callbackfunction) {
@@ -214,10 +216,10 @@ route.get("/getOneBoat", async function (req, res) {
 });
 
 // edit boat
-route.get("/getOneBoat", async function (req, res) {
-  let boatData = await boat.findById(req.body.id);
-  res.send(boatData);
-});
+// route.get("/getOneBoat", async function (req, res) {
+//   let boatData = await boat.findById(req.body.id);
+//   res.send(boatData);
+// });
 
 route.put("/editBoat/:id",
 upload.array("images", 9),
@@ -260,22 +262,24 @@ route.get("/getAllTrips", async function (req, res) {
       }
     }
   }
+  console.log(data , "OWner Trip ");
 
   res.send(data);
 });
-// get All Pending trips
+// getAllPendingTrips
 route.get("/getAllPendingTrips/:id", async function (req, res) {
   console.log(req.params.id);
-  const boatOwnerId = req.params.id
+  const boatOwnerId = req.params.id;
   let boatOwnerData = await boatOwner.findById(boatOwnerId).populate({
     path: "boat",
     model: "boats",
   });
 
-  let tripData = await trips.find({status:'pending'}).populate({
+  let tripData = await trips.find({ status: 'pending' }).populate({
     path: "boatId",
     model: "boats",
   });
+
   let data = [];
   for (let i = 0; i < boatOwnerData.boat.length; i++) {
     for (let j = 0; j < tripData.length; j++) {
@@ -283,27 +287,63 @@ route.get("/getAllPendingTrips/:id", async function (req, res) {
       let ownerb = boatOwnerData.boat[i];
       if (JSON.stringify(tripdatad) === JSON.stringify(ownerb)) {
         console.log("matched");
-        data.push(tripdatad);
+        data.push(tripData[j]);
       } else {
         console.log(ownerb);
       }
     }
   }
+
+  console.log(data, "Owner Trip");
+  res.send(data);
+});
+
+// getAllFinishedTrips
+route.get("/getAllFinishedTrips/:id", async function (req, res) {
+  const boatOwnerId = req.params.id;
+  let boatOwnerData = await boatOwner.findById(boatOwnerId).populate({
+    path: "boat",
+    model: "boats",
+  });
+
+  let tripData = await trips.find({ status: 'finished' }).populate({
+    path: "boatId",
+    model: "boats",
+  });
+
+  let data = [];
+  for (let i = 0; i < boatOwnerData.boat.length; i++) {
+    for (let j = 0; j < tripData.length; j++) {
+      let tripdatad = tripData[j].boatId;
+      let ownerb = boatOwnerData.boat[i];
+      if (JSON.stringify(tripdatad) === JSON.stringify(ownerb)) {
+        console.log("matched");
+        data.push(tripData[j]);
+      }
+    }
+  }
+
+
+
+  console.log(tripData, "Owner Trip");
 
   res.send(data);
 });
-// Get Previous Trips
-route.get("/getAllFinishedTrips/:id", async function (req, res) {
-  const boatOwnerId = req.params.id
+
+
+// getAllCurrentTrips
+route.get("/getAllCurrentTrips/:id", async function (req, res) {
+  const boatOwnerId = req.params.id;
   let boatOwnerData = await boatOwner.findById(boatOwnerId).populate({
     path: "boat",
     model: "boats",
   });
 
-  let tripData = await trips.find({status:'finished'}).populate({
+  let tripData = await trips.find({ status: 'running' }).populate({
     path: "boatId",
     model: "boats",
   });
+
   let data = [];
   for (let i = 0; i < boatOwnerData.boat.length; i++) {
     for (let j = 0; j < tripData.length; j++) {
@@ -311,12 +351,11 @@ route.get("/getAllFinishedTrips/:id", async function (req, res) {
       let ownerb = boatOwnerData.boat[i];
       if (JSON.stringify(tripdatad) === JSON.stringify(ownerb)) {
         console.log("matched");
-        data.push(tripdatad);
-      } else {
-        console.log(ownerb);
+        data.push(tripData[j]);
       }
     }
   }
+  console.log(data);
 
   res.send(data);
 });
@@ -332,20 +371,42 @@ route.get('/BoatTrip', async (req, res) => {
 });
 
 
-// Get avg rate for one boat
-// route.get('/BoatAvgRate',async (req, res) => {
-//   const { boutId } = req.body;
-//   try {
-//     const review = await reviews.find({ boutId });
-//     const totalRating = review.reduce((sum, review) => sum + review.rating, 0);
-//     const averageRating = totalRating / review.length;
-//     res.status(200).json({ averageRating });
-//     // res.send({averageRating})0
-//   } catch (error) {
-//     res.status(500).json({ message: 'Something went wrong.' });
-//   }
-// })
-//
-// get Trips -->> Status
-// uPDATE tRIP STATUS : aCCEPTED , FINISHED , PENDING
+// Owner CanCel Trip 
+
+route.put('/cancelTrip', async (req, res) => {
+  const tripData = await trips.findByIdAndUpdate(req.body.id, {
+    status: "cancelled"
+  })
+  const tripInformation = await trips.findById(req.body.id )
+
+ let tripNotification = "The Trip Canceleld Now "
+  io.emit('Owner-Cancel-Trip', {tripInformation,tripNotification});
+
+  res.send(tripInformation)
+})
+// Owner Accept Trip
+route.put('/acceptTrip', async (req, res) => {
+  const tripData = await trips.findByIdAndUpdate(req.body.id, {
+    status: "accepted"
+  })
+  const tripInformation = await trips.findById(req.body.id )
+
+ let tripNotification = "The Trip accepted Now "
+  io.emit('Owner-accepted-Trip', {tripInformation,tripNotification});
+
+  res.send(tripInformation)
+})
+// Owner finish Trip
+route.put('/finishTrip', async (req, res) => {
+  const tripData = await trips.findByIdAndUpdate(req.body.id, {
+    status: "finished"
+  })
+  const tripInformation = await trips.findById(req.body.id )
+
+ let tripNotification = "The Trip finished Now "
+  io.emit('Owner-finished-Trip', {tripInformation,tripNotification});
+
+  res.send(tripInformation)
+})
+
 module.exports = route;

@@ -1,8 +1,11 @@
 // Call The Connection File 
 require("./config/connection");
-
-// Call Packages 
 const express = require("express");
+const app = express();
+const server = require('http').createServer(app)
+const io = require('./Socket').init(server);
+// Call Packages 
+
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -22,7 +25,7 @@ const adminRoute=require('./Routes/adminRouter')
 
 
 // calling express and use it to use middlewares
-const app = express();
+
 app.use(express.static('uploads'))
 
 
@@ -34,23 +37,20 @@ app.use((req, res, next) => {
 
 app.use(cors());
 
-const server = require('http').createServer(app)
+
 
 // Socket 
-const SocketIO = require('socket.io')
- const io =SocketIO(server,{
-  cors: {
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['my-custom-header'],
-    credentials: true,
-  }
-})
+// const SocketIO = require('socket.io')
+//  const io =SocketIO(server,{
+//   cors: {
+//     methods: ['GET', 'POST'],
+//     allowedHeaders: ['my-custom-header'],
+//     credentials: true,
+//   }
+// })
 
-io.on('connection',(socket)=>{
-    console.log("Hello  Zamzam From Socket");
-    console.log("new User Connected");
-  
-  })
+
+
 
 // calling middlewares : 
 app.use(express.urlencoded({ extended: true }));
@@ -154,4 +154,10 @@ app.post("/register", async function (req, res) {
 
     res.send("data registered");
   });
-module.exports = io ;
+
+
+function add()
+{
+  console.log("object");
+}
+module.exports=add;
