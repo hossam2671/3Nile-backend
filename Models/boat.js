@@ -33,15 +33,11 @@ const boatSchema = mongoose.Schema({
             values: ["shera3", "", "", "", "", ""],
         },
     },
-<<<<<<< Updated upstream
-    numberOfPeople: {
-=======
     category:{
             type:String,
             default:'3nile'
     },
     numberOfpeople: {
->>>>>>> Stashed changes
         type: Number,
         // required: true,
     },

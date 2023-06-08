@@ -131,17 +131,18 @@ route.get('/boat/:id', async (req, res) => {
 })
 
 // aDD tRIP
-route.post('/addTrip', async (req, res) => {
+route.post('/addTrip/:boatId/:clienId', async (req, res) => {
+
   // res.send(req.cookies)
   // let id = jwt.verify(req.cookies.userId, "3-nile");
-  const boatData = await boats.findById(req.body.boatId)
+  const boatData = await boats.findById(req.params.boatId)
   const tripData = await trips.create({
-    boatId: req.body.boatId,
-    //  price:boatData.price*req.body.hours,
+    boatId: req.params.boatId,
     hours: req.body.hours,
-    //  startTime:req.body.startTime,
-    //  date:req.body.date,
-    clienId: req.body.clienId,
+    price:boatData.price*req.body.hours,
+      startTime:req.body.startTime,
+    date:req.body.date,
+    clienId: req.params.clienId,
     status: "pending"
   })
   res.send(boatData)

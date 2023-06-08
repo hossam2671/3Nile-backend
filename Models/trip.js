@@ -10,7 +10,7 @@ const tripSchema=mongoose.Schema({
         },
     startTime:{
         // required:true,
-        type:Number,
+        type:String,
         },
     hours:{
         // required:true,
@@ -18,7 +18,7 @@ const tripSchema=mongoose.Schema({
         },
     date:{
         // required:true,
-        type:Date,
+        type:String,
         },
     clientId:{
         // required:true,
