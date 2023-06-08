@@ -1,4 +1,5 @@
 const express = require("express");
+const  io  = require('../index');
 const route = express.Router();
 const user = require("../Models/client");
 const boats = require("../Models/boat");
@@ -14,7 +15,6 @@ route.use(express.static(path.join(__dirname, "./uploads")));
 route.use(express.static("./uploads"));
 route.use(cors())
 route.use(cookieParser());
-
 // multter img 
 const fileStorage = multer.diskStorage({
   destination: (req, file, callbackfun) => {
@@ -28,7 +28,6 @@ const upload = multer({ storage: fileStorage });
 route.use(cookieParser());
 // Register :
 route.post("/register", async function (req, res) {
-  
 
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
   req.body.password = hashedPassword;
@@ -41,6 +40,7 @@ route.post("/register", async function (req, res) {
   res.send("data registered");
 });
 // Muter Images End 
+
 
 
 
@@ -133,15 +133,15 @@ route.get('/boat/:id', async (req, res) => {
 // aDD tRIP
 route.post('/addTrip', async (req, res) => {
   // res.send(req.cookies)
-  let id = jwt.verify(req.cookies.userId, "3-nile");
-  const boatData = await boats.findById(req.body.id)
+  // let id = jwt.verify(req.cookies.userId, "3-nile");
+  const boatData = await boats.findById(req.body.boatId)
   const tripData = await trips.create({
-    boatId: req.body.id,
+    boatId: req.body.boatId,
     //  price:boatData.price*req.body.hours,
     hours: req.body.hours,
     //  startTime:req.body.startTime,
     //  date:req.body.date,
-    clienId: id,
+    clienId: req.body.clienId,
     status: "pending"
   })
   res.send(boatData)

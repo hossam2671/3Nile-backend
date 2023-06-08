@@ -10,8 +10,8 @@ const bcrypt = require("bcryptjs");
 const Admin = require("./Models/admin");
 const boatOwner = require("./Models/boatOwner");
 const user = require("./Models/client");
-const boat = require("./Models/boat");
-const trip = require("./Models/trip");
+const boats = require("./Models/boat");
+const trips = require("./Models/trip");
 const review = require("./Models/review");
 // Call Routes : 
 
@@ -23,16 +23,31 @@ const adminRoute=require('./Routes/adminRouter')
 
 // calling express and use it to use middlewares
 const app = express();
-app.use(cors());
 app.use(express.static('uploads'))
+
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
+app.use(cors());
 
 const server = require('http').createServer(app)
 
 // Socket 
 const SocketIO = require('socket.io')
-const io =SocketIO(server)
+ const io =SocketIO(server,{
+  cors: {
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['my-custom-header'],
+    credentials: true,
+  }
+})
 
 io.on('connection',(socket)=>{
+    console.log("Hello  Zamzam From Socket");
     console.log("new User Connected");
   
   })
@@ -90,6 +105,8 @@ app.post("/login", async (req, res) => {
         boatOwnerData.password
       );
       if (isValidPassword) {
+        io.emit('boat-owner-Logged', boatOwnerData);
+
         const token = jwt.sign({ boatOwner: boatOwnerData._id }, "3-nile");
         //   console.log(boatOwnerData._id)
         // Set The Id In Cookie With Encryption
@@ -105,6 +122,24 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.post('/addTrip', async (req, res) => {
+  // res.send(req.cookies)
+  // let id = jwt.verify(req.cookies.userId, "3-nile");
+  const boatData = await boats.findById(req.body.boatId)
+  const tripData = await trips.create({
+    boatId: req.body.boatId,
+    //  price:boatData.price*req.body.hours,
+    hours: req.body.hours,
+    //  startTime:req.body.startTime,
+    //  date:req.body.date,
+    clienId: req.body.clienId,
+    status: "pending"
+  })
+  io.emit('You-Has-A-New-Trip', tripData);
+
+
+  res.send(boatData)
+})
 
 // 
 
@@ -119,3 +154,4 @@ app.post("/register", async function (req, res) {
 
     res.send("data registered");
   });
+module.exports = io ;
