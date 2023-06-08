@@ -75,12 +75,16 @@ route.get("/editUserinfo", async function (req, res) {
   let editUserinfo = await user.findById(req.body.id);
   res.send(editUserinfo);
 });
-route.put("/editUserinfo",
-  upload.single("image"),
+route.put("/editUserinfo/:id",
+  upload.single("img"),
   async function (req, res) {
-    let editUserinfo = await user.findByIdAndUpdate(req.body.id, {
+  console.log(req.file)
+    console.log(req.body,"BODY")
+    let editUserinfo = await user.findByIdAndUpdate(req.params.id, {
       name: req.body.name,
-      img: req.file.path,
+      address:req.body.address,
+      phone:req.body.phone,
+      img: req.file.filename,
     });
     res.send("done");
   });

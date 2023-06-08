@@ -16,6 +16,7 @@ const clientschema=mongoose.Schema({
         type:"string",
         // require:true,
         min:5,
+        default:"aswan",
     },
     phone:{
         type:"string",
@@ -24,7 +25,7 @@ const clientschema=mongoose.Schema({
         // unique:true,
     },
     img:{
-        type:"string",  
+        type: String,
     },
     passwod:{
         type:"string",
