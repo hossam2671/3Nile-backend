@@ -37,7 +37,7 @@ const boatSchema = mongoose.Schema(
     category: {
       type: String,
       enum: {
-        values: ["swvl", "", "", "", "", ""],
+        values: ["swvl", "3nile", "", "", "", ""],
       },
       default: "3nile",
     },
