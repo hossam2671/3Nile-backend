@@ -7,12 +7,17 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const Swvl = require("../Models/swvl");
 const uuid = require('uuid');
+const ShortUniqueId = require('short-unique-id');
+const uid = new ShortUniqueId({ length: 4 });
+
 route.use(cors())
 
 
 
 // BarCode Test
 route.get('/', async (req, res) => {
+  const barc = uid();
+  console.log(barc );
   const barcode2 = uuid.v4()
   console.log(barcode2);
   io.emit('User-Finish',{barcode2});
@@ -34,10 +39,11 @@ route.post('/AddTrip', async (req, res) => {
     const swvl = await Swvl.create({
       boat: req.body.boatId,
       time : req.body.time,
-      place:req.body.place,
+      port:req.body.port,
+      targetPlace:req.body.targetPlace,
       date:req.body.date,
       availableSeats:boat.numberOfpeople,
-      priceForTrip: req.body.price,
+      priceForTrip: req.body.priceForTrip,
     });
 
 
@@ -57,8 +63,7 @@ route.get('/swvlTrip', async (req, res) => {
 });
 
 // User Book Swvl Trip 
-route.post('/book', async (req, res) => {
-  console.log(req.body);
+route.post('/userBooking', async (req, res) => {
   const { swvlId, userId, numberOfSeats } = req.body;
   try {
     const swvl = await Swvl.findById(swvlId);
@@ -69,21 +74,24 @@ route.post('/book', async (req, res) => {
       return res.status(400).json({ error: 'No enough available seats' });
     }
     const userDetails = await users.findById(userId);
-    const bookingBarcode =uuid.v4();
+    const bookingBarcode =uid();
     const TripDetails = {
       swvlDetails:swvl,
       numberOfSeats,
       bookingBarcode,
       TotalPrice :numberOfSeats * swvl.priceForTrip
     };
-    let tripNotification = `Client (${userDetails.email}) Has Booked The Trip `
-    io.emit('Swvl-booked', {swvl,tripNotification});
-    swvl.users.push(userId);
+    
     swvl.availableSeats = swvl.availableSeats- numberOfSeats;
-    swvl.barcodeS = [...swvl.barcodeS, bookingBarcode];
+    if(swvl.users.indexOf(userDetails._id)==-1){
+      swvl.users.push(userId);
+    }
+    
+    swvl.bookingInfo = [...swvl.bookingInfo, {Barcode:bookingBarcode,numberOfSeats:numberOfSeats,price:numberOfSeats * swvl.priceForTrip}];
     await swvl.save();
     
-
+    let tripNotification = `Client (${userDetails.email}) Has Booked The Trip `
+    io.emit('Swvl-booked', {swvl,tripNotification});
     return res.status(201).json({ message: 'Swvl trip booked successfully', TripDetails});
   } catch (err) {
     console.error(err);
@@ -91,6 +99,7 @@ route.post('/book', async (req, res) => {
   }
   
 });
+
 
 
 

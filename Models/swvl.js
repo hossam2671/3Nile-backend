@@ -10,8 +10,8 @@ const swvlSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'clients',
   }],
-  barcodeS: [{
-    type: String,
+  bookingInfo: [{
+    type: Object,
     // required: true,
     // unique: true,
   }],
@@ -19,10 +19,14 @@ const swvlSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  place:{
+  port:{
     required:true,  
     type: String,
     enum: ["KFC", "MAC", "Mahata"],
+}  ,
+  targetPlace:{
+    required:true,  
+    type: String,
 }  ,
   date: {
     type: Date,
