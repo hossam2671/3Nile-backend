@@ -199,23 +199,21 @@ route.get('/userTrips', async (req, res) => {
 })
 // get all user finished trips
 
-route.get('/userTrips/finished', async (req, res) => {
-  let id = jwt.verify(req.cookies.userId, "3-nile");
-  const userTrips = await trips.find({ clienId: id, status: "finished" })
+route.get('/userTrips/finished/:id', async (req, res) => {
+  
+  const userTrips = await trips.find({ clienId: req.params.id, status: "finished" })
   res.send(userTrips)
 })
 // get all user pending trips
 
 route.get('/userTrips/pending', async (req, res) => {
-  let id = jwt.verify(req.cookies.userId, "3-nile");
-  const userTrips = await trips.find({ clienId: id, status: "pending" })
+  const userTrips = await trips.find({ clienId: req.params.id, status: "pending" })
   res.send(userTrips)
 })
 
 // get all user accepted trips
 route.get('/userTrips/accepted', async (req, res) => {
-  let id = jwt.verify(req.cookies.userId, "3-nile");
-  const userTrips = await trips.find({ clienId: id, status: "accepted" })
+  const userTrips = await trips.find({ clienId: req.params.id, status: "accepted" })
   res.send(userTrips)
 })
 
