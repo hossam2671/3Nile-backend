@@ -94,7 +94,8 @@ route.get("/getData:id", async function (req, res) {
 // 
 
 
-route.put('/updateData/:id', upload.single('image'), async function (req, res) {
+route.put('/updateData/:id', upload.single('img'), async function (req, res) {
+  console.log(req.body);
   try {
     const boatOwnerId = req.params.id;
     const updatedData = req.body;
@@ -103,14 +104,14 @@ route.put('/updateData/:id', upload.single('image'), async function (req, res) {
       updatedData.img = req.file.filename; // add the file path to the updated data object
     }
 
-    const result = await boatOwner.findByIdAndUpdate(
+    const boatOwnerData = await boatOwner.findByIdAndUpdate(
       boatOwnerId,
       updatedData,
       { new: true }
     );
-    console.log(result,"anasHossam@gmail.com");
     console.log("Data updated");
-    res.status(200).send(result);
+    let boatOwnerr="boatOwner";
+    res.send({boatOwnerData,boatOwnerr});
   } catch (error) {
     res.status(400).send(error.message);
   }
