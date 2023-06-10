@@ -42,7 +42,8 @@ const tripSchema=mongoose.Schema({
 {
     strict:false,
     versionKey:false,
-})
+});
+
 
 const trip=mongoose.model('trips',tripSchema)
 

@@ -43,7 +43,7 @@ route.post("/register", async function (req, res) {
   });
   res.send("data registered");
 });
-// Muter Images End 
+// Multer Images End 
 
 
 
@@ -164,6 +164,7 @@ route.put('/cancelTrip', async (req, res) => {
   const tripData = await trips.findByIdAndUpdate(req.body.id, {
     status: "cancelled"
   })
+
   const tripInformation = await trips.findById(req.body.id )
 
  let tripNotification = "The Trip Canceleld Now "
@@ -201,19 +202,20 @@ route.get('/userTrips', async (req, res) => {
 
 route.get('/userTrips/finished/:id', async (req, res) => {
   
-  const userTrips = await trips.find({ clienId: req.params.id, status: "finished" })
+  const userTrips = await trips.find({ clienId: req.params.id, status: "finished" }).populate("boatId").populate("rate")
   res.send(userTrips)
 })
 // get all user pending trips
 
-route.get('/userTrips/pending', async (req, res) => {
-  const userTrips = await trips.find({ clienId: req.params.id, status: "pending" })
+route.get('/userTrips/pending/:id', async (req, res) => {
+  const userTrips = await trips.find({ clienId: req.params.id, status: "pending" }).populate("boatId")
+  console.log(userTrips)
   res.send(userTrips)
 })
 
 // get all user accepted trips
-route.get('/userTrips/accepted', async (req, res) => {
-  const userTrips = await trips.find({ clienId: req.params.id, status: "accepted" })
+route.get('/userTrips/accepted/:id', async (req, res) => {
+  const userTrips = await trips.find({ clienId: req.params.id, status: "accepted" }).populate("boatId")
   res.send(userTrips)
 })
 
@@ -223,10 +225,7 @@ route.get('/userTrips/accepted', async (req, res) => {
 route.post("/addReview", async (req, res) => {
   try {
     const findTrip = await reviews.find({ tripId: req.body.tripId });
-    // if(findTrip){
-
-    // }else
-    // {
+    
     const review = await reviews.create({
       boatId: req.body.boatId,
       clientId: req.body.clientId,
@@ -234,6 +233,7 @@ route.post("/addReview", async (req, res) => {
       rating: req.body.rating,
       comment: req.body.comment,
     });
+    const tripData = await trips.findByIdAndUpdate(req.body.tripId,{rate:review._id})
     res.status(201).send(review);
 
 

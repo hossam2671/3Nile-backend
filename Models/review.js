@@ -6,6 +6,7 @@ const reviewSchema =mongoose.Schema({
     ref: 'boat'
   },
   tripId: {
+    uniqe:true,
     type: mongoose.Schema.Types.ObjectId,
     ref: 'trip'
   },
