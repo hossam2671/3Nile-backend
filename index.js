@@ -20,7 +20,8 @@ const review = require("./Models/review");
 
 const userRoute=require('./Routes/userRoute')
 const boatOwnerRoute=require('./Routes/boatOwnerRouter')
-const adminRoute=require('./Routes/adminRouter')
+const adminRoute=require('./Routes/adminRouter');
+const swvlRoute=require('./Routes/swvlRoute');
 
 
 
@@ -62,6 +63,7 @@ app.get('/',function(req,res)
 app.use('/user',userRoute)
 app.use('/boatOwner',boatOwnerRoute)
 app.use('/admin',adminRoute)
+app.use('/swvl',swvlRoute)
 
 // port listening
 

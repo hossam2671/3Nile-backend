@@ -25,10 +25,7 @@ const tripSchema=mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,ref:"clients",
         },
     clientsId:[{type:mongoose.Schema.Types.ObjectId,ref:"clients"}],
-    emptySeats:{
-        // required:true,
-        type:Number,
-        },
+  
     rate:{
         type:mongoose.Schema.Types.ObjectId,ref:"reviews",
         },

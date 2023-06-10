@@ -5,6 +5,7 @@ const user = require("../Models/client");
 const boats = require("../Models/boat");
 const trips = require("../Models/trip");
 const reviews = require("../Models/review");
+const Comments = require("../Models/userComments");
 const cookieParser = require("cookie-parser");
 const cors = require("cors")
 const jwt = require("jsonwebtoken");
@@ -319,4 +320,31 @@ route.get("/boats/top-rated", async (req, res) => {
     res.status(500).send(error);
   }
 });
+
+
+
+// Contact Us Page ,User Send Massage 
+route.post('/contactUs', async (req, res) => {
+  const message = await Comments.create({
+    name: req.body.name,
+    email: req.body.email,
+    message: req.body.message,
+    userId: req.body.userId 
+  });
+
+  try {
+    await message.save();
+    console.log(message);
+    const userMassage = await Comments.findById(message._id)
+    let result = 'You Message sent successfully!'
+    res.status(201).send({result,userMassage});
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+
+
+
+
 module.exports = route;
