@@ -80,6 +80,8 @@ route.get("/editUserinfo", async function (req, res) {
   let editUserinfo = await user.findById(req.body.id);
   res.send(editUserinfo);
 });
+
+
 route.put("/editUserinfo/:id",
   upload.single("img"),
   async function (req, res) {
