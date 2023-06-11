@@ -87,7 +87,13 @@ route.get('/swvlTrip/:swvlId', async (req, res) => {
   const swvl = await Swvl.findById(req.params.swvlId).populate("boat");
   console.log(swvl);
   res.send(swvl)
+});
 
+// Get all swvl Tripa  
+route.get('/swvlTrips', async (req, res) => {
+  const swvl = await Swvl.find({}).populate("boat");
+  console.log(swvl)
+  res.send(swvl)
 });
 
 // User Book Swvl Trip 
@@ -109,8 +115,8 @@ route.post('/userBooking', async (req, res) => {
       bookingBarcode,
       TotalPrice :numberOfSeats * swvl.priceForTrip
     };
-    
-    swvl.availableSeats = swvl.availableSeats- numberOfSeats;
+    console.log(swvl.availableSeats)
+     swvl.availableSeats = swvl.availableSeats - numberOfSeats;
     if(swvl.users.indexOf(userDetails._id)==-1){
       swvl.users.push(userId);
     }
