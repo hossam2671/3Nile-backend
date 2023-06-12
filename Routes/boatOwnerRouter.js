@@ -167,6 +167,7 @@ route.post("/addBoat",
         price: req.body.price,
         portName: req.body.portName,
         type: req.body.type,
+        category:req.body.type,
         numberOfpeople: req.body.number,
         images: multiimages,
       });

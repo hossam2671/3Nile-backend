@@ -2,6 +2,7 @@ const express = require("express");
 const  io  = require('../Socket').get();
 const route = express.Router();
 const users = require("../Models/client");
+const boatOwner = require("../Models/boatOwner");
 const boats = require("../Models/boat");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
@@ -25,9 +26,35 @@ route.get('/', async (req, res) => {
   res.send({barcode2});
   });
 
+// Owner Swvl Trips 
+route.get('/boatowner/:id/swvl',async (req, res) => {
+  const boatOwnerId = req.params.id;
+  try {
+    const boatOwnerData = await boatOwner.findById(boatOwnerId);
+    if (!boatOwnerData) {
+      res.status(404).send('Boat owner not found');
+      return;
+    }
+
+    const ownerBoatsIds = boatOwnerData.boat;
+    const ownerboats = await boats.find({ _id: { $in: ownerBoatsIds } });
+    const swvl = await Swvl.find({ boat: { $in: ownerBoatsIds } })
+      .populate('boat')
+      .exec();
+
+    res.status(200).json(swvl);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('An error occurred while fetching data');
+  }
+
+
+});
+
 
 // Boat Owner add Trip 
 route.post('/AddTrip', async (req, res) => {
+  console.log("Reqq", req.body);
 
   try {
     const boat = await boats.findById(req.body.boatId);
@@ -56,8 +83,9 @@ route.post('/AddTrip', async (req, res) => {
 
 
 // Get Trip By Id 
-route.get('/swvlTrip', async (req, res) => {
-  const swvl = await Swvl.findById(req.body.swvlId);
+route.get('/swvlTrip/:swvlId', async (req, res) => {
+  const swvl = await Swvl.findById(req.params.swvlId).populate("boat");
+  console.log(swvl);
   res.send(swvl)
 
 });
