@@ -126,6 +126,7 @@ route.post('/userBooking', async (req, res) => {
     
     let tripNotification = `Client (${userDetails.email}) Has Booked The Trip `
     io.emit('Swvl-booked', {swvl,tripNotification});
+    
     return res.status(201).json({ message: 'Swvl trip booked successfully', TripDetails});
   } catch (err) {
     console.error(err);
