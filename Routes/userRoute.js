@@ -87,14 +87,17 @@ route.put("/editUserinfo/:id",
   upload.single("img"),
   async function (req, res) {
   console.log(req.file)
-    console.log(req.body,"BODY")
+    console.log(req.body.img,"BODY")
+    console.log(req.params.id)
     let editUserinfo = await user.findByIdAndUpdate(req.params.id, {
       name: req.body.name,
       address:req.body.address,
       phone:req.body.phone,
-      img: req.file.filename,
+       img: req.file.name,
     });
-    res.send("done");
+    let userData = await user.findById(req.params.id)
+    // console.log(userData,"data")
+    res.send(userData);
   });
 
 //get all boats

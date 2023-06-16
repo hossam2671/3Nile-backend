@@ -26,6 +26,7 @@ const clientschema=mongoose.Schema({
     },
     img:{
         type: String,
+        default: 'pro.png',
     },
     passwod:{
         type:"string",
