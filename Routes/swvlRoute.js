@@ -104,8 +104,8 @@ route.post('/userBooking', async (req, res) => {
     if (!swvl) {
       return res.status(404).json({ error: 'Swvl trip not found' });
     }
-    if (swvl.availableSeats < numberOfSeats) {
-      return res.status(400).json({ error: 'No enough available seats' });
+    if (swvl.availableSeats < numberOfSeats ||numberOfSeats<0 ) {
+      return res.send({ error: 'Sorry , No enough available seats' })
     }
     const userDetails = await users.findById(userId);
     const bookingBarcode =uid();
@@ -126,6 +126,7 @@ route.post('/userBooking', async (req, res) => {
     
     let tripNotification = `Client (${userDetails.email}) Has Booked The Trip `
     io.emit('Swvl-booked', {swvl,tripNotification});
+    
     return res.status(201).json({ message: 'Swvl trip booked successfully', TripDetails});
   } catch (err) {
     console.error(err);

@@ -139,7 +139,7 @@ route.get('/boat/:id', async (req, res) => {
 })
 
 // aDD tRIP
-route.post('/addTrip/:boatId/:clienId', async (req, res) => {
+route.post('/addTrip/:boatId/:clientId', async (req, res) => {
 
   // res.send(req.cookies)
   // let id = jwt.verify(req.cookies.userId, "3-nile");
@@ -148,9 +148,9 @@ route.post('/addTrip/:boatId/:clienId', async (req, res) => {
     boatId: req.params.boatId,
     hours: req.body.hours,
     price:boatData.price*req.body.hours,
-      startTime:req.body.startTime,
+    startTime:req.body.startTime,
     date:req.body.date,
-    clienId: req.params.clienId,
+    clientId: req.params.clientId,
     status: "pending"
   })
 

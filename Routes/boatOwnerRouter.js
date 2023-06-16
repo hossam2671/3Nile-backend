@@ -162,13 +162,17 @@ route.post("/addBoat",
       }
       let multiimages = req.files.map((file) => file.filename);
       // console.log(multiimages)
+      let category ;
+      if(req.body.type==="shera3"){
+        category = "3nile"
+      }
       let boatData = await boat.create({
         name: req.body.name,
         description: req.body.description,
         price: req.body.price,
         portName: req.body.portName,
         type: req.body.type,
-        category:req.body.type,
+        category:category,
         numberOfpeople: req.body.number,
         images: multiimages,
       });
@@ -342,7 +346,7 @@ route.get("/getAllCurrentTrips/:id", async function (req, res) {
     model: "boats",
   });
 
-  let tripData = await trips.find({ status: 'running' }).populate({
+  let tripData = await trips.find({ status: 'accepted' }).populate({
     path: "boatId",
     model: "boats",
   });
@@ -384,8 +388,8 @@ route.put('/cancelTrip', async (req, res) => {
 
  let tripNotification = "The Trip Canceleld Now "
   io.emit('Owner-Cancel-Trip', {tripInformation,tripNotification});
-
-  res.send(tripInformation)
+  let message = tripNotification
+  res.send({tripInformation,message})
 })
 // Owner Accept Trip
 route.put('/acceptTrip', async (req, res) => {
@@ -394,11 +398,23 @@ route.put('/acceptTrip', async (req, res) => {
   })
   const tripInformation = await trips.findById(req.body.id )
 
- let tripNotification = "The Trip accepted Now "
+ let tripNotification = "The Trip accepted Now " 
   io.emit('Owner-accepted-Trip', {tripInformation,tripNotification});
+      let message = tripNotification
+  res.send({tripInformation,message})
+})    
 
-  res.send(tripInformation)
-})
+
+
+// 
+
+
+
+
+
+
+
+
 // Owner finish Trip
 route.put('/finishTrip', async (req, res) => {
   const tripData = await trips.findByIdAndUpdate(req.body.id, {
@@ -409,7 +425,9 @@ route.put('/finishTrip', async (req, res) => {
  let tripNotification = "The Trip finished Now "
   io.emit('Owner-finished-Trip', {tripInformation,tripNotification});
 
-  res.send(tripInformation)
+  let message = tripNotification
+  res.send({tripInformation,message})
 })
+
 
 module.exports = route;
