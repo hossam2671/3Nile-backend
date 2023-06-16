@@ -33,7 +33,7 @@ const upload = multer({ storage: fileStorage });
 route.use(cookieParser());
 // Register :
 route.post("/register", async function (req, res) {
-
+console.log(req.body)
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
   req.body.password = hashedPassword;
   let userData = await user.create({
@@ -64,7 +64,7 @@ route.post("/login", async (req, res) => {
       if (isValidPassword) {
         const token = jwt.sign({ user: userData._id }, "3-nile");
         // Set The Id In Cookie With Encryption
-        res.cookie("userId", token, { maxAge: 900000, httpOnly: true });
+        // res.cookie("userId", token, { maxAge: 900000, httpOnly: true });
         res.send(userData);
       } else {
         res.send("Invalid Password");
