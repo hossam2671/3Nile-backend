@@ -93,7 +93,7 @@ route.put("/editUserinfo/:id",
       name: req.body.name,
       address:req.body.address,
       phone:req.body.phone,
-      // img: req.file,
+       img: req.file.name,
     });
     let userData = await user.findById(req.params.id)
     // console.log(userData,"data")
