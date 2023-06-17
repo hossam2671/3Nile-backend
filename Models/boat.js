@@ -10,7 +10,7 @@ const boatSchema = mongoose.Schema(
       type: String,
       // required: true,
       mminLength: 100,
-      maxLength: 400,
+      // maxLength: 400,
     },
     images: {
       type: [String],
@@ -31,7 +31,7 @@ const boatSchema = mongoose.Schema(
       type: String,
       // required: true,
       enum: {
-        values: ["shera3", "swvl", "", "", "", ""],
+        values: ["shera3", "swvl", "Dahabiya", "Felucca", "Houseboat", ""],
       },
     },
     category: {
