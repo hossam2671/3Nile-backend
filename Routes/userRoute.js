@@ -214,6 +214,7 @@ route.get('/userTrips/finished/:id', async (req, res) => {
 // get all user pending trips
 
 route.get('/userTrips/pending/:id', async (req, res) => {
+  console.log(req.params.id)
   const userTrips = await trips.find({ clienId: req.params.id, status: "pending" }).populate("boatId")
   console.log(userTrips)
   res.send(userTrips)

@@ -34,6 +34,7 @@ const tripSchema=mongoose.Schema({
                    // required:true, 
             type: String,
             enum: ['finished', 'pending',"accepted","cancelled"],
+            default:"pending",
 }  
 },
 {
