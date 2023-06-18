@@ -81,7 +81,12 @@ app.post("/login", async (req, res) => {
       try {
         const userData = await user.findOne({ email: req.body.email });
         if (!userData) {
-          res.status(401).json({ error: "Invalid credentials" });
+          res.json({
+            message: "No Account Found, Try Again",
+            status: 401,
+            data: req.body,
+            success: false,
+          }); 
         } else {
           const isValidPassword = await bcrypt.compare(
             req.body.password,
@@ -94,11 +99,21 @@ app.post("/login", async (req, res) => {
             let user = 'user'
             res.send({userData,user});
           } else {
-            res.send("Invalid Password");
+            res.json({
+              message: "invalid credentials , password incorrect",
+              status: 401,
+              data: req.body,
+              success: false,
+            }); 
           } 
         }
       } catch (err) {
-        res.status(401).json({ error: err.message });
+        res.json({
+          message: "invalid credentials , password incorrect",
+          status: 401,
+          data: req.body,
+          success: false,
+        }); 
       }
  
     } else {
@@ -114,13 +129,33 @@ app.post("/login", async (req, res) => {
         // Set The Id In Cookie With Encryption
         res.cookie("boatOwnerId", token, { maxAge: 9000000, httpOnly: true });
         let boatOwner = 'boatOwner'
-        res.send({boatOwnerData,boatOwner});
+        if(boatOwnerData.status==='pending'){
+          res.json({
+            message: "Welcome Back,Please Wait Until Admin Accept You ,Try Login Again Later",
+            status: 401,
+            data: req.body,
+            success: false,
+          })
+        }else{
+
+          res.send({boatOwnerData,boatOwner});
+        }
       } else {
-        res.send("Invalid Password");
+        res.json({
+          message: "Invalid Password, Try Again",
+          status: 401,
+          data: req.body,
+          success: false,
+        }); 
       }
     }
   } catch (err) {
-    res.status(401).json({ error: err.message });
+    res.json({
+      message: "Invalid Values , Try Again",
+      status: 401,
+      data: req.body,
+      success: false,
+    }); 
   }
 });
 
@@ -130,10 +165,10 @@ app.post('/addTrip', async (req, res) => {
   const boatData = await boats.findById(req.body.boatId)
   const tripData = await trips.create({
     boatId: req.body.boatId,
-    //  price:boatData.price*req.body.hours,
+     price:boatData.price*req.body.hours,
     hours: req.body.hours,
-    //  startTime:req.body.startTime,
-    //  date:req.body.date,
+     startTime:req.body.startTime,
+     date:req.body.date,
     clienId: req.body.clienId,
     status: "pending"
   })
