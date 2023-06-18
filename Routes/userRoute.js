@@ -6,6 +6,8 @@ const boats = require("../Models/boat");
 const trips = require("../Models/trip");
 const reviews = require("../Models/review");
 const Comments = require("../Models/userComments");
+const mongoose = require('mongoose');
+const { ObjectId } = require('mongoose').Types;
 const cookieParser = require("cookie-parser");
 const cors = require("cors")
 const jwt = require("jsonwebtoken");
@@ -100,17 +102,18 @@ route.get("/editUserinfo", async function (req, res) {
 route.put("/editUserinfo/:id",
   upload.single("img"),
   async function (req, res) {
-  console.log(req.file)
-    console.log(req.body.img,"BODY")
+    console.log("dddd")
+  console.log(req)
+    console.log(req.body,"BODY")
     console.log(req.params.id)
     let editUserinfo = await user.findByIdAndUpdate(req.params.id, {
       name: req.body.name,
       address:req.body.address,
       phone:req.body.phone,
-       img: req.file.name,
+       img: req.body.name,
     });
     let userData = await user.findById(req.params.id)
-    // console.log(userData,"data")
+    console.log(userData,"data")
     res.send(userData);
   });
 
@@ -335,21 +338,24 @@ route.get('/userTrips', async (req, res) => {
 
 route.get('/userTrips/finished/:id', async (req, res) => {
   
-  const userTrips = await trips.find({ clienId: req.params.id, status: "finished" }).populate("boatId").populate("rate")
+  const userTrips = await trips.find({$and:[ {clientId:id},{ status: "finished"}] }).populate("boatId").populate("rate")
   res.send(userTrips)
 })
 // get all user pending trips
 
 route.get('/userTrips/pending/:id', async (req, res) => {
+  // const userId = new mongoose.Types.ObjectId(req.params.id);
   console.log(req.params.id)
-  const userTrips = await trips.find({ clienId: req.params.id, status: "pending" }).populate("boatId")
+  let id=new ObjectId( req.params.id)
+  console.log(id)
+  const userTrips = await trips.find({$and:[ {clientId:id},{ status: "pending"}] }).populate("boatId")
   console.log(userTrips)
   res.send(userTrips)
 })
 
 // get all user accepted trips
 route.get('/userTrips/accepted/:id', async (req, res) => {
-  const userTrips = await trips.find({ clienId: req.params.id, status: "accepted" }).populate("boatId")
+  const userTrips = await trips.find({$and:[ {clientId:id},{ status: "accepted"}] }).populate("boatId").populate("rate")
   res.send(userTrips)
 })
 
