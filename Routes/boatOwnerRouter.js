@@ -52,6 +52,7 @@ route.post("/register",
 
 // Log In :
 route.post("/login", async (req, res) => {
+  console.log("first")
   try {
     const boatOwnerData = await boatOwner.findOne({ email: req.body.email });
     if (!boatOwnerData) {

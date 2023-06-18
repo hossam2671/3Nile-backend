@@ -337,7 +337,7 @@ route.get('/userTrips', async (req, res) => {
 // get all user finished trips
 
 route.get('/userTrips/finished/:id', async (req, res) => {
-  
+  let id=new ObjectId( req.params.id)
   const userTrips = await trips.find({$and:[ {clientId:id},{ status: "finished"}] }).populate("boatId").populate("rate")
   res.send(userTrips)
 })
@@ -355,6 +355,7 @@ route.get('/userTrips/pending/:id', async (req, res) => {
 
 // get all user accepted trips
 route.get('/userTrips/accepted/:id', async (req, res) => {
+  let id=new ObjectId( req.params.id)
   const userTrips = await trips.find({$and:[ {clientId:id},{ status: "accepted"}] }).populate("boatId").populate("rate")
   res.send(userTrips)
 })
