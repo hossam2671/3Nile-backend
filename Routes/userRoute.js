@@ -4,6 +4,7 @@ const route = express.Router();
 const user = require("../Models/client");
 const boats = require("../Models/boat");
 const trips = require("../Models/trip");
+const boatOwner = require("../Models/boatOwner");
 const reviews = require("../Models/review");
 const Comments = require("../Models/userComments");
 const mongoose = require('mongoose');
@@ -18,6 +19,8 @@ route.use(express.static(path.join(__dirname, "./uploads")));
 route.use(express.static("./uploads"));
 route.use(cors())
 route.use(cookieParser());
+const moment = require('moment-timezone');
+
 // multter img 
 // io.on('connection',(socket)=>{
 //   console.log("new User Connectedd");
@@ -36,7 +39,19 @@ route.use(cookieParser());
 // Register :
 route.post("/register", async function (req, res) {
 console.log(req.body)
-  const hashedPassword = await bcrypt.hash(req.body.password, 10);
+  let exist = await user.findOne({ email: req.body.email })
+  let existOwner = await boatOwner.findOne({ email: req.body.email })
+
+  console.log(exist);
+  if(exist||existOwner){
+    res.json({
+      message: "email aready exist",
+      status: 400,
+      // data: req.body,
+      success: false,
+    });
+  }else{
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
   req.body.password = hashedPassword;
   let userData = await user.create({
     name: req.body.name,
@@ -44,7 +59,18 @@ console.log(req.body)
     password: req.body.password,
   //   // 'img':req.body.img
   });
-  res.send("data registered");
+  console.log(userData);
+  res.json({
+    message: "Successfull regestration go to sign-in",
+    status: 200,
+    // data: userData,
+    success: true,
+  });
+
+  }
+
+
+
 });
 // Multer Images End 
 
@@ -103,18 +129,20 @@ route.put("/editUserinfo/:id",
   upload.single("img"),
   async function (req, res) {
     console.log("dddd")
-  console.log(req)
+  let data ;
     console.log(req.body,"BODY")
     console.log(req.params.id)
     let editUserinfo = await user.findByIdAndUpdate(req.params.id, {
       name: req.body.name,
       address:req.body.address,
       phone:req.body.phone,
-       img: req.body.name,
-    });
-    let userData = await user.findById(req.params.id)
-    console.log(userData,"data")
-    res.send(userData);
+       img: req.file.filename,
+    }).then((res)=>{
+      console.log(res,"dsada");
+      data= res
+    })
+  
+    res.send(data);
   });
 
 //get all boats
@@ -158,66 +186,42 @@ route.get('/boat/:id', async (req, res) => {
   }
 })
 
-// aDD tRIP
-route.post('/addTrip/:boatId/:clientId', async (req, res) => {
+// aDD tRIP Test one
+// route.post('/addTrip/:boatId/:clientId', async (req, res) => {
+//       const boatData = await boats.findById(req.params.boatId);
 
-  // res.send(req.cookies)
-  // let id = jwt.verify(req.cookies.userId, "3-nile");
-  const boatData = await boats.findById(req.params.boatId)
-  const tripData = await trips.create({
-    boatId: req.params.boatId,
-    hours: req.body.hours,
-    price:boatData.price*req.body.hours,
-    startTime:req.body.startTime,
-    date:req.body.date,
-    clientId: req.params.clientId,
-    status: "pending"
-  })
+//   console.log(req.body,"body");
+// console.log(req.body.date,req.body.startTime);
+//   // Create a JavaScript Date object using the date and start time values
+//   const { date, startTime } = req.body;
 
-    // Check if the boat has any existing trips at the specified start time and date
-    const existingTrip = await trips.findOne({
-      boatId: req.params.boatId,
-      startTime: req.body.startTime,
-      date: req.body.date,
-      status: { $ne: 'cancelled' } // Exclude cancelled trips
-    });
+//   // Convert the date string to a JavaScript Date object
+//   const tripDate = new Date(date + ' ' + (new Date()).getFullYear() + ' ' + startTime);
+//       console.log(tripDate);
+//   const tripData = await trips.create({
+//     boatId: req.params.boatId,
+//     hours: req.body.hours,
+//     price: boatData.price * req.body.hours,
+//     startTime: tripDate, // Store as Date type
+//     date: tripDate, // Store as Date type
+//     clientId: req.params.clientId,
+//     status: 'pending'
+//   });
 
-    if (existingTrip) {
-      console.log("The boat already has a trip scheduled at this time and date.");
-      res.json({
-        message: "The boat already has a trip scheduled at this time and date.",
-        status: 201,
-        data: existingTrip,
-        success: false,
-      }); 
-    }
-    else{
+//   console.log(tripData);
+//   // // Socket
+//   // let tripNotification = "You Got A New Trip Request"
+//   // io.emit('You-Got-New-Trip-Request', { tripData, tripNotification });
+//   // console.log("Your Trip Booked Successfully, Please Wait Until BoatOwner Accepts It");
 
-   
-
-    // No conflicting trips found, proceed with creating the new trip
-    const tripData = await trips.create({
-      boatId: req.params.boatId,
-      hours: req.body.hours,
-      price: boatData.price * req.body.hours,
-      startTime: req.body.startTime,
-      date: req.body.date,
-      clientId: req.params.clientId,
-      status: 'pending'
-    });
-
-// Socket
-  let tripNotification = "You Got A New Trip Request"
-  io.emit('You-Got-New-Trip-Request', {tripData,tripNotification});
-  console.log("Your Trip Booked Succussfully , Please Wait Until BoatOwner Accept It");
-  res.json({
-    message: "Your Trip Booked Succussfully , Please Wait Until BoatOwner Accept It",
-    status: 200,
-    data: tripData,
-    success: true,
-  }); 
-}
-})
+//   res.json({
+//     message: "Your Trip Booked Successfully, Please Wait Until BoatOwner Accepts It",
+//     status: 200,
+//     // data: tripData,
+//     success: true,
+//   });
+// });
+// aDD tRIP Test Two
 // route.post('/addTrip/:boatId/:clientId', async (req, res) => {
 //   try {
 //     const boatData = await boats.findById(req.params.boatId);
@@ -293,6 +297,84 @@ route.post('/addTrip/:boatId/:clientId', async (req, res) => {
 //     return res.status(500).json({ message: 'An error occurred while adding the trip.' });
 //   }
 // });
+
+
+route.post('/addTrip/:boatId/:clientId', async (req, res) => {
+      const boatData = await boats.findById(req.params.boatId);
+  console.log(req.body, "body");
+  const { date, startTime, hours } = req.body;
+  const tripDate = new Date(date + ' ' + (new Date()).getFullYear() + ' ' + startTime);
+  console.log(tripDate,"Trip Date");
+
+
+  
+//  let tripDate= new Date(date + ' ' + startTime);
+  // const tripDateTime = moment.tz(`${date} ${startTime}`, 'MMM DD YYYY HH:mm:ss', 'Africa/Cairo');
+  // console.log(tripDateTime,"tripDateTime");
+  // let ennnd = tripDateTime.format()
+  // console.log(ennnd.split("-"),ennnd.split("-")[2].split("+"));
+  // var arr1=ennnd.split("-");
+  // day=arr1[2].split('T')
+  // console.log(arr1[0]);
+  // let time=day[1].split("+")
+  // console.log(arr1[1]-1);
+  // console.log(day[0]);
+  // let timearr=time[0].split(":")
+  // console.log(timearr);
+  // var newdate=new Date(arr1[0],arr1[1]-1,day[0],timearr[0],timearr[1],timearr[2])
+  // console.log(newdate,"New");
+
+
+
+  const endTime = new Date(tripDate.getTime() + hours * 60 * 60 * 1000);
+  const isAvailable = await trips.findOne({
+    boatId: req.params.boatId,
+    startTime: {
+      $lte: endTime,
+    },
+    endTime: {
+      $gte: tripDate,
+    },
+  });
+
+  if (isAvailable) {
+    return res.json({
+                message: "The boat is already booked during the specified period. Please choose a different time",
+                status: 201,
+                // data: ongoingTrip,
+                success: false,
+              });
+  }
+
+  const tripData = await trips.create({
+    boatId: req.params.boatId,
+    hours: hours,
+    price: boatData.price * hours,
+    startTime: tripDate, 
+    endTime: endTime,
+    clientId: req.params.clientId,
+    status: 'pending'
+  });
+
+  console.log(tripData);
+  // Socket
+  let tripNotification = "You Got A New Trip Request"
+  io.emit('You-Got-New-Trip-Request', { tripData, tripNotification });
+  console.log("Your Trip Booked Successfully, Please Wait Until BoatOwner Accepts It");
+
+  res.json({
+    message: "Your Trip Booked Successfully, Please Wait Until BoatOwner Accepts It",
+    status: 200,
+    data: tripData,
+    success: true,
+  });
+})
+
+
+
+
+
+
 
 
 // cancel trip
@@ -372,7 +454,7 @@ route.post("/addReview", async (req, res) => {
       clientId: req.body.clientId,
       tripId: req.body.tripId,
       rating: req.body.rating,
-      comment: req.body.comment,
+      // comment: req.body.comment,
     });
     const tripData = await trips.findByIdAndUpdate(req.body.tripId,{rate:review._id})
     res.status(201).send(review);

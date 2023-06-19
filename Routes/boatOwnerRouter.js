@@ -4,6 +4,7 @@ const route = express.Router();
 const boat = require("../Models/boat");
 const trips = require("../Models/trip");
 const boatOwner = require("../Models/boatOwner");
+const user = require("../Models/client");
 const reviews = require("../Models/Offer");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
@@ -37,17 +38,35 @@ route.use(cookieParser());
 route.post("/register",
   upload.single("image"),
   async function (req, res) {
-    console.log(req.body)
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    req.body.password = hashedPassword;
-    let boatOwnerData = await boatOwner.create({
-      name: req.body.name,
-      email: req.body.email,
-      password: req.body.password,
-      // imgUrl: req.file.filename,
-      // 'img':req.body.img
+    let existUser = await user.findOne({ email: req.body.email })
+    let exist = await boatOwner.findOne({ email: req.body.email })
+  console.log(exist);
+  if(exist||existUser){
+    res.json({
+      message: "email aready exist",
+      status: 400,
+      // data: req.body,
+      success: false,
     });
-    res.send("data registered");
+  }else{
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+  req.body.password = hashedPassword;
+  let userData = await boatOwner.create({
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password,
+  //   // 'img':req.body.img
+  });
+  console.log(userData);
+  res.json({
+    message: "Successfull regestration go to sign-in",
+    status: 200,
+    // data: userData,
+    success: true,
+  });
+
+  }
+
   });
 
 // Log In :
@@ -220,6 +239,10 @@ console.log(req.params);
 
 route.get("/getOneBoat", async function (req, res) {
   let boatData = await boat.findById(req.body.boatId);
+  res.send(boatData);
+});
+route.get("/getTripDetails/:id", async function (req, res) {
+  let boatData = await boat.findById(req.params.tripId);
   res.send(boatData);
 });
 
