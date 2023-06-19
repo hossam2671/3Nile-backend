@@ -25,6 +25,9 @@ const ownerSchema = mongoose.Schema({
     img:{
         type:String,
     },
+    coverImg:{
+        type:String,
+    },
     boat:
         [
             {type:mongoose.Schema.Types.ObjectId,

@@ -137,24 +137,27 @@ route.put('/updateData/:id', upload.single('img'), async function (req, res) {
     res.status(400).send(error.message);
   }
 });
+// Cover Edit
+route.put('/ownerCover/:id', upload.single('img'), async function (req, res) {
+  console.log(req.file);
+  
+    const boatOwnerId = req.params.id;
+
+    const boatOwnerData = await boatOwner.findByIdAndUpdate(
+      boatOwnerId,{
+        coverImg:req.file.filename
+      }
+     
+    );
+    console.log(boatOwnerData,"Data updated");
+    let boatOwnerr="boatOwner";
+    res.send({boatOwnerData,boatOwnerr});
+
+  
+});
 // 
 
-route.put('/updateDataa/:id', async function (req, res) {
-  try {
-    const boatOwnerId = req.params.id;
-    const updatedData = req.body;
 
-    const result = await boatOwner.findByIdAndUpdate(
-      boatOwnerId,
-      updatedData,
-      { new: true }
-    );
-    console.log("Data updated");
-    res.status(200).send(result);
-  } catch (error) {
-    res.status(400).send(error.message);
-  }
-});
 
 // get All His boats
 route.get("/getAllBoats/:id", async function (req, res) {
