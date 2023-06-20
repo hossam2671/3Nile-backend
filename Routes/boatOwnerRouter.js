@@ -42,6 +42,7 @@ route.post("/register",
     let exist = await boatOwner.findOne({ email: req.body.email })
   console.log(exist);
   if(exist||existUser){
+    console.log("email aready exist")
     res.json({
       message: "email aready exist",
       status: 400,
@@ -57,7 +58,7 @@ route.post("/register",
     password: req.body.password,
   //   // 'img':req.body.img
   });
-  console.log(userData);
+  console.log("Successfull regestration go to sign-in");
   res.json({
     message: "Successfull regestration go to sign-in",
     status: 200,
@@ -188,6 +189,15 @@ route.post("/addBoat",
       let category ;
       if(req.body.type==="shera3"){
         category = "3nile"
+      }else if(req.body.type==="Felucca"){
+        category = "3nile"
+      }else if(req.body.type==="Houseboat"){
+        category = "3nile vip"
+      }else if(req.body.type==="Dahabiya"){
+        category = "3nile vip"
+      }
+      else{
+        category = "swvl"
       }
       let boatData = await boat.create({
         name: req.body.name,
