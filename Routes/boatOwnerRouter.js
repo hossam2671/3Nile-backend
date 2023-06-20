@@ -42,6 +42,7 @@ route.post("/register",
     let exist = await boatOwner.findOne({ email: req.body.email })
   console.log(exist);
   if(exist||existUser){
+    console.log("email aready exist")
     res.json({
       message: "email aready exist",
       status: 400,
@@ -57,7 +58,7 @@ route.post("/register",
     password: req.body.password,
   //   // 'img':req.body.img
   });
-  console.log(userData);
+  console.log("Successfull regestration go to sign-in");
   res.json({
     message: "Successfull regestration go to sign-in",
     status: 200,
