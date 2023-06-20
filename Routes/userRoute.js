@@ -155,20 +155,20 @@ route.get("/boats", async (req, res) => {
 //get all boats in category 1
 
 route.get("/category/3nile/boats", async (req, res) => {
-  const firCatBoats = await boats.find({ category: "3nile" });
+  const firCatBoats = await boats.find({ category: "3nile" ,status: { $ne: "blocked" }});
   // console.log(firCatBoats);
   res.send(firCatBoats);
 });
 
 //get all boats in category 2
 route.get("/category/3nileplus/boats", async (req, res) => {
-  const secCatBoats = await boats.find({ category: "3nileplus" });
+  const secCatBoats = await boats.find({ category: "3nileplus",status: { $ne: "blocked" } });
   res.send(secCatBoats);
 });
 
 //get all boats in category 3
 route.get("/category/3nilevip/boats", async (req, res) => {
-  const thiCatBoats = await boats.find({ category: "3nile vip" });
+  const thiCatBoats = await boats.find({ category: "3nile vip",status: { $ne: "blocked" } });
   res.send(thiCatBoats);
 });
 
@@ -371,7 +371,7 @@ if(req.body.date===""||req.body.startTime===""||req.body.hours===""){
 
 // cancel trip
 route.put('/cancelTrip', async (req, res) => {
-  const tripData = await trips.findByIdAndUpdate(req.body.id, {
+  const tripData = await trips.findByIdAndUpdate(req.  .id, {
     status: "cancelled"
   })
 
