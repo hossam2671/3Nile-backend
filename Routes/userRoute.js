@@ -362,7 +362,7 @@ route.post('/addTrip/:boatId/:clientId', async (req, res) => {
 
 // cancel trip
 route.put('/cancelTrip', async (req, res) => {
-  const tripData = await trips.findByIdAndUpdate(req.body.id, {
+  const tripData = await trips.findByIdAndUpdate(req.  .id, {
     status: "cancelled"
   })
 
