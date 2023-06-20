@@ -188,6 +188,15 @@ route.post("/addBoat",
       let category ;
       if(req.body.type==="shera3"){
         category = "3nile"
+      }else if(req.body.type==="Felucca"){
+        category = "3nile"
+      }else if(req.body.type==="Houseboat"){
+        category = "3nile vip"
+      }else if(req.body.type==="Dahabiya"){
+        category = "3nile vip"
+      }
+      else{
+        category = "swvl"
       }
       let boatData = await boat.create({
         name: req.body.name,
