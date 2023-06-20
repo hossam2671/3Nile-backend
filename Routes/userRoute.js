@@ -136,13 +136,13 @@ route.put("/editUserinfo/:id",
       name: req.body.name,
       // address:req.body.address,
       phone:req.body.phone,
-       img: req.file.filename,
+      //  img: req.file.filename,
     }).then((res)=>{
       console.log(res,"dsada");
       data= res
     })
-  
-    res.send(data);
+    let usery = await user.findById(req.params.id)
+    res.send(usery);
   });
 
 //get all boats
@@ -306,23 +306,6 @@ route.post('/addTrip/:boatId/:clientId', async (req, res) => {
   const tripDate = new Date(date + ' ' + (new Date()).getFullYear() + ' ' + startTime);
   console.log(tripDate,"Trip Date");
 
-
-  
-//  let tripDate= new Date(date + ' ' + startTime);
-  // const tripDateTime = moment.tz(`${date} ${startTime}`, 'MMM DD YYYY HH:mm:ss', 'Africa/Cairo');
-  // console.log(tripDateTime,"tripDateTime");
-  // let ennnd = tripDateTime.format()
-  // console.log(ennnd.split("-"),ennnd.split("-")[2].split("+"));
-  // var arr1=ennnd.split("-");
-  // day=arr1[2].split('T')
-  // console.log(arr1[0]);
-  // let time=day[1].split("+")
-  // console.log(arr1[1]-1);
-  // console.log(day[0]);
-  // let timearr=time[0].split(":")
-  // console.log(timearr);
-  // var newdate=new Date(arr1[0],arr1[1]-1,day[0],timearr[0],timearr[1],timearr[2])
-  // console.log(newdate,"New");
 
 
 
