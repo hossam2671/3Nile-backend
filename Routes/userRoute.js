@@ -7,8 +7,12 @@ const trips = require("../Models/trip");
 const boatOwner = require("../Models/boatOwner");
 const reviews = require("../Models/review");
 const Comments = require("../Models/userComments");
+<<<<<<< Updated upstream
 const mongoose = require('mongoose');
 const { ObjectId } = require('mongoose').Types;
+=======
+const ObjectId = require("mongodb").ObjectID;
+>>>>>>> Stashed changes
 const cookieParser = require("cookie-parser");
 const cors = require("cors")
 const jwt = require("jsonwebtoken");
@@ -126,16 +130,22 @@ route.get("/editUserinfo", async function (req, res) {
 
 
 route.put("/editUserinfo/:id",
-  upload.single("img"),
+  // upload.single("img"),
   async function (req, res) {
+<<<<<<< Updated upstream
     console.log("dddd")
   let data ;
     console.log(req.body,"BODY")
+=======
+  // console.log(req.file)
+    console.log(req.body.img,"BODY")
+>>>>>>> Stashed changes
     console.log(req.params.id)
     let editUserinfo = await user.findByIdAndUpdate(req.params.id, {
       name: req.body.name,
-      address:req.body.address,
+      // address:req.body.address,
       phone:req.body.phone,
+<<<<<<< Updated upstream
        img: req.file.filename,
     }).then((res)=>{
       console.log(res,"dsada");
@@ -143,6 +153,13 @@ route.put("/editUserinfo/:id",
     })
   
     res.send(data);
+=======
+      //  img: req.file.name,
+    });
+    let userData = await user.findById(req.params.id)
+    // console.log(userData,"data")
+    res.send(userData);
+>>>>>>> Stashed changes
   });
 
 //get all boats

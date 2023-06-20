@@ -20,6 +20,10 @@ const clientschema=mongoose.Schema({
     },
     phone:{
         type:"string",
+<<<<<<< Updated upstream
+=======
+        default:""
+>>>>>>> Stashed changes
         // require:true,
         // unique:true,
     },
