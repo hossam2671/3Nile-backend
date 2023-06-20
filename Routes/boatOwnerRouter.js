@@ -446,7 +446,7 @@ route.put('/acceptTrip', async (req, res) => {
 route.put('/finishTrip', async (req, res) => {
   const tripData = await trips.findByIdAndUpdate(req.body.id, {
     status: "finished"
-  })
+})
   const tripInformation = await trips.findById(req.body.id )
 
  let tripNotification = "The Trip finished Now "
