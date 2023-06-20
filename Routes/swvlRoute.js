@@ -18,9 +18,7 @@ route.use(cors())
 // BarCode Test
 route.get('/', async (req, res) => {
   const barc = uid();
-  console.log(barc );
   const barcode2 = uuid.v4()
-  console.log(barcode2);
   io.emit('User-Finish',{barcode2});
 
   res.send({barcode2});
@@ -54,11 +52,9 @@ route.get('/boatowner/:id/swvl',async (req, res) => {
 
 // Boat Owner add Trip 
 route.post('/AddTrip', async (req, res) => {
-  console.log("Reqq", req.body);
 
   try {
     const boat = await boats.findById(req.body.boatId);
-    console.log(boat);
     if (!boat) {
       return res.status(404).json({ error: 'Boat not found' });
     }
@@ -85,14 +81,12 @@ route.post('/AddTrip', async (req, res) => {
 // Get Trip By Id 
 route.get('/swvlTrip/:swvlId', async (req, res) => {
   const swvl = await Swvl.findById(req.params.swvlId).populate("boat");
-  console.log(swvl);
   res.send(swvl)
 });
 
 // Get all swvl Tripa  
 route.get('/swvlTrips', async (req, res) => {
   const swvl = await Swvl.find({}).populate("boat");
-  console.log(swvl)
   res.send(swvl)
 });
 
@@ -115,7 +109,6 @@ route.post('/userBooking', async (req, res) => {
       bookingBarcode,
       TotalPrice :numberOfSeats * swvl.priceForTrip
     };
-    console.log(swvl.availableSeats)
      swvl.availableSeats = swvl.availableSeats - numberOfSeats;
     if(swvl.users.indexOf(userDetails._id)==-1){
       swvl.users.push(userId);
