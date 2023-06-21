@@ -71,16 +71,27 @@ route.post("/login", async (req, res) => {
   });
 
 //   Get Admin Data  : 
-route.get('/getData', async function(req,res){
-    // let adminID = jwt.verify(req.cookies.admin, "3-nile");
-    // console.log(adminID);
-    // let adminData = await admin.findById(adminID.admin)
-    // console.log(adminData);
-    let adminData = await admin.findOne({email:req.body.email})
-    console.log(adminData);
-    res.json(adminData)
+route.get('/getData/:email', async function(req,res){
+  let adminData = await admin.findOne({email:req.params.email})
+  console.log(adminData);
+  res.json(adminData)
 })
 
+route.put("/editAdminData/:email",
+  upload.single("img"),
+  async function (req, res) {
+    console.log(req.file)
+      let adminData = await admins.find({email:req.params.email})
+      console.log(adminData)
+    let editUserinfo = await admins.findByIdAndUpdate("adminData._id", {
+      img: req.file.filename,
+  
+    }).then((res)=>{
+      console.log(res,"dsada");
+    })
+    let admin = await admins.find({email:req.params.email})
+    res.send(admin);
+  });
 // get All Users 
 route.get('/getAllUsers',async function(req,res){
     let allUsers = await users.find({})
@@ -96,6 +107,29 @@ route.get('/getAllBoats',async function(req,res){
     let allBoats = await boats.find({})
     res.send(allBoats)
 })
+route.get('/getTrip/:id', async (req, res) => {
+  try {
+    const trip = await trips.findById(req.params.id);
+    const boat = await boats.findById(trip.boatId);
+    const user = await users.findById(trip.clientId);
+    res.status(200).send({trip,user,boat});
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+route.get('/getAllBoatss', async function(req, res) {
+  try {
+    const allBoats = await boats.find({}).populate('reviews');
+    console.log(allBoats)
+    res.send(allBoats.rating);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+
+
 // get All trips
 route.get('/getAllTrips',async function(req,res){
     let allTrips = await trips.find({})
@@ -431,9 +465,14 @@ route.get('/num-reviews', async function(req,res){
   console.log("reviews",count);
   res.json(count);
 })
-// 
+// get users comments
 
-
+route.get('/comments', async function(req,res){
+  let commentsData = await comments.find({});
+  console.log("comments",commentsData);
+  res.json(commentsData)
+}
+)
 
 
 
