@@ -15,6 +15,7 @@ const bcrypt = require("bcryptjs");
 const moment = require('moment');
 const path = require("path");
 const multer = require("multer");
+const comments = require("../Models/userComments");
 route.use(express.static(path.join(__dirname, "./uploads")));
 route.use(express.static("./uploads"));
 
@@ -41,7 +42,7 @@ route.post("/register", upload.single("image"), async function (req, res) {
     // 'img':req.body.img
     // img: req.file.path,
   });
-  res.send("wata registered");
+  res.send("data registered");
 });
 // Log In :
 route.post("/login", async (req, res) => {
@@ -420,9 +421,14 @@ route.get('/num-offers', async function(req,res){
   console.log(count);
   res.json(count);
 })
+route.get('/num-comments', async function(req,res){
+  let count = await comments.countDocuments();
+  console.log("comments",count);
+  res.json(count);
+})
 route.get('/num-reviews', async function(req,res){
   let count = await reviews.countDocuments();
-  console.log(count);
+  console.log("reviews",count);
   res.json(count);
 })
 // 
