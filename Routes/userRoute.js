@@ -7,7 +7,8 @@ const trips = require("../Models/trip");
 const boatOwner = require("../Models/boatOwner");
 const reviews = require("../Models/review");
 const Comments = require("../Models/userComments");
-const ObjectId = require("mongodb").ObjectID;
+const mongoose = require('mongoose');
+const { ObjectId } = require('mongoose').Types;
 const cookieParser = require("cookie-parser");
 const cors = require("cors")
 const jwt = require("jsonwebtoken");
@@ -135,11 +136,13 @@ route.put("/editUserinfo/:id",
       name: req.body.name,
       // address:req.body.address,
       phone:req.body.phone,
-      //  img: req.file.name,
-    });
-    let userData = await user.findById(req.params.id)
-    // console.log(userData,"data")
-    res.send(userData);
+      //  img: req.file.filename,
+    }).then((res)=>{
+      console.log(res,"dsada");
+      data= res
+    })
+    let usery = await user.findById(req.params.id)
+    res.send(usery);
   });
 
 //get all boats
@@ -151,20 +154,20 @@ route.get("/boats", async (req, res) => {
 //get all boats in category 1
 
 route.get("/category/3nile/boats", async (req, res) => {
-  const firCatBoats = await boats.find({ category: "3nile" });
+  const firCatBoats = await boats.find({ category: "3nile" ,status: { $ne: "blocked" }});
   // console.log(firCatBoats);
   res.send(firCatBoats);
 });
 
 //get all boats in category 2
 route.get("/category/3nileplus/boats", async (req, res) => {
-  const secCatBoats = await boats.find({ category: "3nileplus" });
+  const secCatBoats = await boats.find({ category: "3nileplus",status: { $ne: "blocked" } });
   res.send(secCatBoats);
 });
 
 //get all boats in category 3
 route.get("/category/3nilevip/boats", async (req, res) => {
-  const thiCatBoats = await boats.find({ category: "3nile vip" });
+  const thiCatBoats = await boats.find({ category: "3nile vip",status: { $ne: "blocked" } });
   res.send(thiCatBoats);
 });
 
@@ -304,23 +307,6 @@ route.post('/addTrip/:boatId/:clientId', async (req, res) => {
   console.log(tripDate,"Trip Date");
 
 
-  
-//  let tripDate= new Date(date + ' ' + startTime);
-  // const tripDateTime = moment.tz(`${date} ${startTime}`, 'MMM DD YYYY HH:mm:ss', 'Africa/Cairo');
-  // console.log(tripDateTime,"tripDateTime");
-  // let ennnd = tripDateTime.format()
-  // console.log(ennnd.split("-"),ennnd.split("-")[2].split("+"));
-  // var arr1=ennnd.split("-");
-  // day=arr1[2].split('T')
-  // console.log(arr1[0]);
-  // let time=day[1].split("+")
-  // console.log(arr1[1]-1);
-  // console.log(day[0]);
-  // let timearr=time[0].split(":")
-  // console.log(timearr);
-  // var newdate=new Date(arr1[0],arr1[1]-1,day[0],timearr[0],timearr[1],timearr[2])
-  // console.log(newdate,"New");
-
 
 
   const endTime = new Date(tripDate.getTime() + hours * 60 * 60 * 1000);
@@ -425,7 +411,7 @@ route.get('/userTrips/finished/:id', async (req, res) => {
 route.get('/userTrips/pending/:id', async (req, res) => {
   // const userId = new mongoose.Types.ObjectId(req.params.id);
   console.log(req.params.id)
-  let id=new ObjectId( req.params.id)
+  let id=new ObjectId(req.params.id)
   console.log(id)
   const userTrips = await trips.find({$and:[ {clientId:id},{ status: "pending"}] }).populate("boatId")
   console.log(userTrips)

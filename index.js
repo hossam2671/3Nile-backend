@@ -81,6 +81,7 @@ app.post("/login", async (req, res) => {
       try {
         const userData = await user.findOne({ email: req.body.email });
         if (!userData) {
+          console.log("No Account Found, Try Again")
           res.json({
             message: "No Account Found, Try Again",
             status: 401,
@@ -88,17 +89,31 @@ app.post("/login", async (req, res) => {
             success: false,
           }); 
         } else {
+
           const isValidPassword = await bcrypt.compare(
             req.body.password,
             userData.password
           );
           if (isValidPassword) {
-            const token = jwt.sign({ user: userData._id }, "3-nile");
-            // Set The Id In Cookie With Encryption
-            res.cookie("userId", token, { maxAge: 900000, httpOnly: true });
-            let user = 'user'
-            res.send({userData,user});
+
+            if(userData.status!=="blocked"){
+              const token = jwt.sign({ user: userData._id }, "3-nile");
+              // Set The Id In Cookie With Encryption
+              res.cookie("userId", token, { maxAge: 900000, httpOnly: true });
+              let user = 'user'
+              res.send({userData,user});
+            }
+            else{
+              res.json({
+                message: "Sorry , You Were Blocked ",
+                status: 401,
+                data: req.body,
+                success: false,
+              }); 
+            }
+           
           } else {
+            console.log("invalid credentials , password incorrect")
             res.json({
               message: "invalid credentials , password incorrect",
               status: 401,
@@ -108,6 +123,7 @@ app.post("/login", async (req, res) => {
           } 
         }
       } catch (err) {
+        console.log("password incorrect")
         res.json({
           message: "invalid credentials , password incorrect",
           status: 401,
@@ -130,6 +146,7 @@ app.post("/login", async (req, res) => {
         res.cookie("boatOwnerId", token, { maxAge: 9000000, httpOnly: true });
         let boatOwner = 'boatOwner'
         if(boatOwnerData.status==='pending'){
+          console.log("Welcome Back,Please Wait Until Admin Accept You ,Try Login Again Later")
           res.json({
             message: "Welcome Back,Please Wait Until Admin Accept You ,Try Login Again Later",
             status: 401,
@@ -141,6 +158,7 @@ app.post("/login", async (req, res) => {
           res.send({boatOwnerData,boatOwner});
         }
       } else {
+        console.log("Invalid Password, Try Again")
         res.json({
           message: "Invalid Password, Try Again",
           status: 401,
@@ -188,7 +206,7 @@ app.post("/register", async function (req, res) {
       // 'img':req.body.img
     });
     io.emit('boat-owner-registered', ownerData);
-
+      console.log("REeeegisteds")
     res.send("data registered");
   });
 
