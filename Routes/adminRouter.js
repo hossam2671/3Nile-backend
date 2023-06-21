@@ -10,6 +10,8 @@ const reviews = require('../Models/review')
 const admins = require('../Models/admin')
 const cors = require("cors")
 const cookieParser = require("cookie-parser");
+const { ObjectId } = require('mongoose').Types;
+
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const moment = require('moment');
@@ -212,9 +214,17 @@ route.get('/getUserData/:id', async (req, res) => {
   // get user trips by id ,
   route.get('/userTrips/:id', async (req, res) => {
 
-    const userTrips = await trips.find({clienId:req.params.id}).populate("boatId")
-    const userData = await users.findById(req.params.id);
-    res.send({"trip":userTrips,"userData":userData});
+    const user = await users.find({clienId:req.params.id})
+    const userTrips = await trips.find({clienId:user._id}).populate("boatId")
+    console.log(userTrips,"sdsdas");
+    res.send(userTrips);
+    })
+  route.get('/getBoatTrips/:id', async (req, res) => {
+    const boat = await boats.findById(req.params.id)
+
+    const BoatTrips = await trips.find({boatId:boat._id})
+    console.log(BoatTrips,"BoatTrips");
+    res.send(BoatTrips);
     })
 // Get Boat By Id ,
 route.get('/getBoatData/:id', async (req, res) => {
