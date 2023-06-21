@@ -44,7 +44,6 @@ console.log(req.body)
 
   console.log(exist);
   if(exist||existOwner){
-    console.log("email aready exist")
     res.json({
       message: "email aready exist",
       status: 400,
@@ -60,7 +59,7 @@ console.log(req.body)
     password: req.body.password,
   //   // 'img':req.body.img
   });
-  console.log("Successfull regestration go to sign-in");
+  console.log(userData);
   res.json({
     message: "Successfull regestration go to sign-in",
     status: 200,
@@ -303,19 +302,13 @@ route.get('/boat/:id', async (req, res) => {
 route.post('/addTrip/:boatId/:clientId', async (req, res) => {
       const boatData = await boats.findById(req.params.boatId);
   console.log(req.body, "body");
-
-
-if(req.body.date===""||req.body.startTime===""||req.body.hours===""){
-  return res.json({
-    message: "Invalid Values , Please Try Again",
-    status: 202,
-    // data: ongoingTrip,
-    success: false,
-  });
-}else{
   const { date, startTime, hours } = req.body;
   const tripDate = new Date(date + ' ' + (new Date()).getFullYear() + ' ' + startTime);
   console.log(tripDate,"Trip Date");
+
+
+
+
   const endTime = new Date(tripDate.getTime() + hours * 60 * 60 * 1000);
   const isAvailable = await trips.findOne({
     boatId: req.params.boatId,
@@ -358,8 +351,6 @@ if(req.body.date===""||req.body.startTime===""||req.body.hours===""){
     data: tripData,
     success: true,
   });
-}
- 
 })
 
 
@@ -371,7 +362,7 @@ if(req.body.date===""||req.body.startTime===""||req.body.hours===""){
 
 // cancel trip
 route.put('/cancelTrip', async (req, res) => {
-  const tripData = await trips.findByIdAndUpdate(req.  .id, {
+  const tripData = await trips.findByIdAndUpdate(req.body.id, {
     status: "cancelled"
   })
 

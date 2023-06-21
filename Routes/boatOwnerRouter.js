@@ -223,6 +223,49 @@ route.post("/addBoat",
   }
 );
 
+// add Boat mobile
+route.post("/addBoatt",
+  async function (req, res) {
+    // console.log(req.cookies.boatOwnerId);
+    console.log(req.files)
+    console.log(req.body.boatOwnerId);
+    try {
+      // console.log(multiimages)
+      let category ;
+      if(req.body.type==="shera3"){
+        category = "3nile"
+      }else if(req.body.type==="Felucca"){
+        category = "3nile"
+      }else if(req.body.type==="Houseboat"){
+        category = "3nile vip"
+      }else if(req.body.type==="Dahabiya"){
+        category = "3nile vip"
+      }
+      else{
+        category = "swvl"
+      }
+      let boatData = await boat.create({
+        name: req.body.name,
+        description: req.body.description,
+        price: req.body.price,
+        portName: req.body.portName,
+        type: req.body.type,
+        category:category,
+        numberOfpeople: req.body.number,
+      });
+      // let boatOwnerId = req.cookies.boatOwnerId
+      // let boatOwnerId = '646d225031823a799fb95c7b';
+      let boatOwnerData = await boatOwner.findByIdAndUpdate(req.body.boatOwnerId, {
+        $push: { boat: boatData._id },
+      });
+          
+      res.send(boatOwnerData);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Error adding boat!');
+    }
+  }
+);
 // delete boat
 route.delete("/deleteBoat/:id/:ownerId", async function (req, res) {
 console.log(req.params);
