@@ -371,7 +371,7 @@ if(req.body.date===""||req.body.startTime===""||req.body.hours===""){
 
 // cancel trip
 route.put('/cancelTrip', async (req, res) => {
-  const tripData = await trips.findByIdAndUpdate(req.  .id, {
+  const tripData = await trips.findByIdAndUpdate(req.body.id, {
     status: "cancelled"
   })
 
