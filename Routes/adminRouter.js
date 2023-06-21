@@ -44,6 +44,7 @@ route.post("/register", upload.single("image"), async function (req, res) {
     // 'img':req.body.img
     // img: req.file.path,
   });
+ 
   res.send("data registered");
 });
 // Log In :

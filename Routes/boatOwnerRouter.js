@@ -56,12 +56,15 @@ route.post("/register",
   }else{
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
   req.body.password = hashedPassword;
-  let userData = await boatOwner.create({
+  let boatOwnerData = await boatOwner.create({
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
   //   // 'img':req.body.img
   });
+ 
+    // Emit a 'registration' event to notify the front-end
+io.emit("registeration", "A new boat owner has registered!");
   console.log("Successfull regestration go to sign-in");
   res.json({
     message: "Successfull regestration go to sign-in",
@@ -74,6 +77,7 @@ route.post("/register",
 
   });
 
+  
 // Log In :
 route.post("/login", async (req, res) => {
   console.log("first")
