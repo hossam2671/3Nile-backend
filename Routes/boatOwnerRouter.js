@@ -6,6 +6,10 @@ const trips = require("../Models/trip");
 const boatOwner = require("../Models/boatOwner");
 const user = require("../Models/client");
 const reviews = require("../Models/Offer");
+const sizeOf = require('image-size');
+const sharp = require('sharp');
+const mime = require('mime-types');
+
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -139,24 +143,195 @@ route.put('/updateData/:id', upload.single('img'), async function (req, res) {
   }
 });
 // Cover Edit
+// route.put('/ownerCover/:id', upload.single('img'), async function (req, res) {
+//   console.log(req.file);
+
+//     const boatOwnerId = req.params.id;
+
+//     const boatOwnerData = await boatOwner.findByIdAndUpdate(
+//       boatOwnerId,{
+//         coverImg:req.file.filename
+//       }
+     
+//     );
+//     console.log(boatOwnerData,"Data updated");
+//     let boatOwnerr="boatOwner";
+//     res.send({boatOwnerData,boatOwnerr});
+
+  
+// });
+// 
+// Cover Edit 
+
+
+// route.put('/ownerCover/:id', upload.single('img'), async function (req, res) {
+//   console.log(req.file);
+
+//   const boatOwnerId = req.params.id;
+
+//   // Read the uploaded image file
+//   const imageBuffer = req.file.buffer;
+
+//   // Dynamically import the file-type library
+//   const FileType = (await import('file-type')).default;
+
+//   // Get the file type
+//   const fileType = await FileType.fileTypeFromBuffer(imageBuffer);
+
+//   // Check if the file type is supported and it is an image
+//   if (!fileType || !fileType.mime.startsWith('image/')) {
+//     res.json({
+//       message: "Invalid Image Type",
+//       status: 400,
+//       success: false,
+//     }); 
+//   }
+
+//   // Check the width of the image
+//   const imageMetadata = await sharp(imageBuffer).metadata();
+//   const imageWidth = imageMetadata.width;
+//   const requiredWidth = 800; // Adjust this value to your desired width
+
+//   if (imageWidth !== requiredWidth) {
+//     res.json({
+//       message: `Invalid image width. Required width: ${requiredWidth}`,
+//       status: 400,
+//       success: false,
+//     });
+//   }
+//   const boatOwnerData = await boatOwner.findByIdAndUpdate(
+//     boatOwnerId,
+//     {
+//       coverImg: req.file.filename
+//     }
+//   );
+
+//   console.log(boatOwnerData, "Data updated");
+
+//   let boatOwnerr = "boatOwner";
+//   res.json({
+//     message: `your Cover Has Been Updated`,
+//     status: 200,
+//     data:{ boatOwnerData, boatOwnerr },
+//     success: false,
+//   })
+// })
+
+
+
 route.put('/ownerCover/:id', upload.single('img'), async function (req, res) {
   console.log(req.file);
-  
-    const boatOwnerId = req.params.id;
+  const boatOwnerId = req.params.id;
+  if (!req.file||req.file===undefined) {
+    
+    res.json({
+            message: `Invalid image ,Try Again`,
+            status: 400,
+            success: false,
+          }); 
+  }else{
 
-    const boatOwnerData = await boatOwner.findByIdAndUpdate(
-      boatOwnerId,{
-        coverImg:req.file.filename
+  
+  const imageDimensions = sizeOf(req.file.path);
+  const imageWidth = imageDimensions.width;
+  const requiredWidth = 1000; 
+   if (!req.file.mimetype.startsWith('image/')) {
+        res.json({
+          message: "Invalid Image Type",
+          status: 400,
+          success: false,
+        }); 
+    
       }
-     
-    );
-    console.log(boatOwnerData,"Data updated");
-    let boatOwnerr="boatOwner";
-    res.send({boatOwnerData,boatOwnerr});
-
+      
+  else if (imageWidth < requiredWidth) {
+    console.log(`Invalid image width. Required width: ${requiredWidth}`)
+    res.json({
+            message: `Invalid image width. Required width: ${requiredWidth}`,
+            status: 400,
+            success: false,
+          }); 
+  }
+ 
+else{
   
-});
-// 
+  const boatOwnerUpdate= await boatOwner.findByIdAndUpdate(
+    boatOwnerId,
+    {
+      coverImg: req.file.filename
+    }
+    );
+    
+    console.log(boatOwnerUpdate ,"Data updated");
+      const boatOwnerData = await boatOwner.findById(boatOwnerId)
+    let boatOwnerr = "boatOwner";
+    res.json({
+      message: `your Cover Has Been Updated`,
+      status: 200,
+      data:{ boatOwnerData, boatOwnerr },
+      success: false,
+    }); 
+    
+  }
+}
+  });
+    
+    
+    
+    
+    // route.put('/ownerCover/:id', upload.single('img'), async function (req, res) {
+      //   console.log(req.file);
+
+//   const boatOwnerId = req.params.id;
+//   const sharp = require('sharp');
+//   const imageBuffer = await sharp(req.file.buffer).toBuffer();
+
+//   const FileType = (await import('file-type')).default;
+
+//   const fileType = await FileType.fromBuffer(imageBuffer);
+
+//   if (!fileType || !fileType.mime.startsWith('image/')) {
+//     res.json({
+//       message: "Invalid Image Type",
+//       status: 400,
+//       success: false,
+//     }); 
+
+//   }
+
+//   // Check the width of the image
+//   const imageMetadata = await sharp(imageBuffer).metadata();
+//   const imageWidth = imageMetadata.width;
+//   const requiredWidth = 800; // Adjust this value to your desired width
+
+//   if (imageWidth !== requiredWidth) {
+//     res.json({
+//       message: `Invalid image width. Required width: ${requiredWidth}`,
+//       status: 400,
+//       success: false,
+//     }); 
+//   }
+
+//   const boatOwnerData = await boatOwner.findByIdAndUpdate(
+//     boatOwnerId,
+//     {
+//       coverImg: req.file.filename
+//     }
+//   );
+
+//   console.log(boatOwnerData, "Data updated");
+
+//   let boatOwnerr = "boatOwner";
+//   res.json({
+//     message: `your Cover Has Been Updated`,
+//     status: 200,
+//     data:{ boatOwnerData, boatOwnerr },
+//     success: false,
+//   }); 
+//   // res.send({ boatOwnerData, boatOwnerr });
+// });
+
+
 
 
 

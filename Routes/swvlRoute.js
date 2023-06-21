@@ -70,7 +70,7 @@ route.post('/AddTrip', async (req, res) => {
     });
 
 
-    return res.status(201).json({ message: 'Swvl trip created successfully' ,Tripdetails:swvl});
+    return res.status(201).json({ message: 'Trip created successfully' ,Tripdetails:swvl});
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: 'Internal server error' });
