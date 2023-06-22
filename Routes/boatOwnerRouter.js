@@ -64,7 +64,7 @@ route.post("/register",
   });
  
     // Emit a 'registration' event to notify the front-end
-io.emit("registeration", "A new boat owner has registered!");
+io.emit("registeration", "A new boat owner has registered!",boatOwnerData);
   console.log("Successfull regestration go to sign-in");
   res.json({
     message: "Successfull regestration go to sign-in",
