@@ -52,6 +52,7 @@ route.get('/boatowner/:id/swvl',async (req, res) => {
 
 // Boat Owner add Trip 
 route.post('/AddTrip', async (req, res) => {
+  console.log(req.body)
 
   try {
     const boat = await boats.findById(req.body.boatId);

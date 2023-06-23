@@ -120,8 +120,29 @@ route.get("/getData:id", async function (req, res) {
   res.send(boatOwnerData);
 });
 
+// edit owner info mobile
+route.put('/update/:id',async function (req , res){
+  const boatOwnerData = await boatOwner.findByIdAndUpdate(req.params.id,{
+    name:req.body.name,
+    phone:req.body.phone,
+  })
+  const ownerData = await boatOwner.findById(req.params.id)
+  res.send(ownerData)
+}) 
 
-// 
+//edit user image mobile 
+route.put('/editImage/:id',upload.single('img'),async function (req,res){
+  console.log(req.body)
+  console.log(req.file,"jgjkk")
+  const boatOwnerData = await boatOwner.findByIdAndUpdate(req.params.id,{
+    img:req.file.filename
+  })
+  console.log("first")
+  res.send(boatOwnerData)
+
+})
+
+// edit owner info
 
 
 route.put('/updateData/:id', upload.single('img'), async function (req, res) {
@@ -406,7 +427,7 @@ route.post("/addBoat",
 route.post("/addBoatt",
   async function (req, res) {
     // console.log(req.cookies.boatOwnerId);
-    console.log(req.files)
+    // console.log(req.files)
     console.log(req.body.boatOwnerId);
     try {
       // console.log(multiimages)
@@ -430,7 +451,7 @@ route.post("/addBoatt",
         portName: req.body.portName,
         type: req.body.type,
         category:category,
-        numberOfpeople: req.body.number,
+        // numberOfpeople: req.body.number,
       });
       // let boatOwnerId = req.cookies.boatOwnerId
       // let boatOwnerId = '646d225031823a799fb95c7b';
