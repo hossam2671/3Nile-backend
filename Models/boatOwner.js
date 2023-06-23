@@ -24,6 +24,7 @@ const ownerSchema = mongoose.Schema({
     },
     img:{
         type:String,
+        default: 'pro.png',
     },
     coverImg:{
         type:String,

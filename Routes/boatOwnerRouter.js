@@ -136,7 +136,7 @@ route.put('/editImage/:id',upload.single('img'),async function (req,res){
   console.log(req)
   console.log(req.file,"jgjkk")
   const boatOwnerData = await boatOwner.findByIdAndUpdate(req.params.id,{
-    img:req.filename
+    img:req.file.filename
   })
   console.log("first")
   res.send(boatOwnerData)

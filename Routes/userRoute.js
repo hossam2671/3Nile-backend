@@ -119,6 +119,14 @@ route.post("/login", async (req, res) => {
 });
 
 //edit user image mobile
+route.put('/editImage/:id',upload.single('img'),async function (req,res){
+  console.log(req.file)
+  const userData = await user.findByIdAndUpdate(req.params.id,{
+    img:req.file.filename
+  })
+  console.log("first")
+  res.send(userData)
+})
 
 // edit user info 
 
