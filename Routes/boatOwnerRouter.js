@@ -132,10 +132,10 @@ route.put('/update/:id',async function (req , res){
 
 //edit user image mobile 
 route.put('/editImage/:id',upload.single('img'),async function (req,res){
-  console.log(req.body)
+  console.log(req)
   console.log(req.file,"jgjkk")
   const boatOwnerData = await boatOwner.findByIdAndUpdate(req.params.id,{
-    img:req.file.filename
+    img:req.filename
   })
   console.log("first")
   res.send(boatOwnerData)
@@ -425,45 +425,58 @@ route.post("/addBoat",
 
 // add Boat mobile
 route.post("/addBoatt",
+upload.array("images", 9),
   async function (req, res) {
     // console.log(req.cookies.boatOwnerId);
     // console.log(req.files)
-    console.log(req.body.boatOwnerId);
-    try {
-      // console.log(multiimages)
-      let category ;
-      if(req.body.type==="shera3"){
-        category = "3nile"
-      }else if(req.body.type==="Felucca"){
-        category = "3nile"
+    console.log(req.body);
+     if (req.files === undefined) {
+       res.status(400).send('No files were uploaded.');
+       return;
+     }
+     let multiimages = req.files.map((file) => file.filename);
+      try {
+       // console.log(multiimages)
+       let category ;
+       if(req.body.type==="shera3"){
+         category = "3nile"
+       }else if(req.body.type==="Felucca"){
+         category = "3nile"
       }else if(req.body.type==="Houseboat"){
-        category = "3nile vip"
-      }else if(req.body.type==="Dahabiya"){
+         category = "3nile vip"
+       }else if(req.body.type==="Dahabiya"){
         category = "3nile vip"
       }
-      else{
+       else{
         category = "swvl"
-      }
-      let boatData = await boat.create({
-        name: req.body.name,
-        description: req.body.description,
-        price: req.body.price,
-        portName: req.body.portName,
-        type: req.body.type,
-        category:category,
-        // numberOfpeople: req.body.number,
+       }
+       let boatData = await boat.create({
+         name: req.body.name,
+         description: req.body.description,
+         price: req.body.price,
+         portName: req.body.portName,
+         type: req.body.type,
+         category:category,
+         images: multiimages,
+        //numberOfpeople: req.body.number,
       });
-      // let boatOwnerId = req.cookies.boatOwnerId
-      // let boatOwnerId = '646d225031823a799fb95c7b';
-      let boatOwnerData = await boatOwner.findByIdAndUpdate(req.body.boatOwnerId, {
+       // let boatOwnerId = req.cookies.boatOwnerId
+    //   // let boatOwnerId = '646d225031823a799fb95c7b';
+       let boatOwnerData = await boatOwner.findByIdAndUpdate(req.body.id, {
         $push: { boat: boatData._id },
-      });
+       });
+
+       let boatOwnerData2 = await boatOwner.findById(req.body.id);
+       let data = [];
+       for (let i = 0; i < boatOwnerData2.boat.length; i++) {
+         data.push(await boat.findById(boatOwnerData2.boat[i]));
+       }
           
-      res.send(boatOwnerData);
-    } catch (err) {
-      console.error(err);
-      res.status(500).send('Error adding boat!');
-    }
+       res.send(data);
+     } catch (err) {
+       console.error(err);
+       res.status(500).send('Error adding boat!');
+     }
   }
 );
 // delete boat
@@ -593,10 +606,7 @@ route.get("/getAllFinishedTrips/:id", async function (req, res) {
     model: "boats",
   });
 
-  let tripData = await trips.find({ status: 'finished' }).populate({
-    path: "boatId",
-    model: "boats",
-  });
+  let tripData = await trips.find({ status: 'finished' }).populate("boatId").populate("rate");
 
   let data = [];
   for (let i = 0; i < boatOwnerData.boat.length; i++) {

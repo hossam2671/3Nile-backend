@@ -117,13 +117,9 @@ route.post("/login", async (req, res) => {
     });   }
 });
 
-// edit user info 
-route.get("/editUserinfo", async function (req, res) {
- 
-  let editUserinfo = await user.findById(req.body.id);
-  res.send(editUserinfo);
-});
+//edit user image mobile
 
+// edit user info 
 
 route.put("/editUserinfo/:id",
   // upload.single("img"),
