@@ -20,6 +20,7 @@ route.use(express.static("./uploads"));
 route.use(cors())
 route.use(cookieParser());
 const moment = require('moment-timezone');
+const Notification = require("../Models/notifications");
 
 // multter img 
 // io.on('connection',(socket)=>{
@@ -145,6 +146,47 @@ route.put("/editUserinfo/:id",
 route.get("/boats", async (req, res) => {
   const allBoats = await boats.find();
   res.send(allBoats);
+});
+// Get notifications
+route.get("/notifications/:id", async (req, res) => {
+  try {
+    const allNotifications = await Notification.find({ clientId: req.params.id });
+    const readNotifications = allNotifications.filter(notification => notification.status === "read");
+    const unreadNotifications = allNotifications.filter(notification => notification.status === "unRead");
+
+    const response = {
+      readNotifications,
+      unreadNotifications
+    };
+
+    console.log(response);
+    res.send(response);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// Make As Read 
+
+route.put("/notifications/:id/mark-as-read", async (req, res) => {
+  try {
+    const notification = await Notification.findOneAndUpdate(
+      { _id: req.params.id, status: "unRead" },
+      { $set: { status: "read" } },
+      { new: true }
+    );
+
+    if (!notification) {
+      return res.status(404).send("Notification not found or already marked as read.");
+    }
+
+    console.log(notification);
+    res.send(notification);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 //get all boats in category 1

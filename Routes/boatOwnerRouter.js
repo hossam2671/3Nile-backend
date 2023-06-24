@@ -18,6 +18,7 @@ const mongoose = require("mongoose");
 const cors = require("cors")
 const path = require("path");
 const multer = require("multer");
+const Notification = require("../Models/notifications");
 route.use(express.static(path.join(__dirname, "./uploads")));
 route.use(express.static("./uploads"));
 route.use(cors())
@@ -688,8 +689,17 @@ route.put('/acceptTrip', async (req, res) => {
   })
   const tripInformation = await trips.findById(req.body.id )
 
+
  let tripNotification = "The Trip accepted Now " 
-  io.emit('Owner-accepted-Trip', {tripInformation,tripNotification});
+ const notification = new Notification({
+   message: tripNotification,
+   clientId: tripInformation.clientId,
+   createdAt:Date.now() ,
+   status:'unRead'
+  });
+  io.emit('Owner-accepted-Trip', {notification});
+
+  await notification.save();
       let message = tripNotification
   res.send({tripInformation,message})
 })    
