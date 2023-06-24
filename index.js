@@ -210,9 +210,15 @@ app.post("/register", async function (req, res) {
     res.send("data registered");
   });
 
-
+  io.on('connection', (socket) => {
+    socket.on('chat-message', (roomId, message) => {
+      console.log(roomId,message);
+      io.emit('chat-message', message);
+    });
+  });
 function add()
 {
   console.log("object");
 }
+
 module.exports=add;
