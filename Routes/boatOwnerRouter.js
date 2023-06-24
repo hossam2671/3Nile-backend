@@ -697,8 +697,11 @@ route.put('/acceptTrip', async (req, res) => {
    createdAt:Date.now() ,
    status:'unRead'
   });
-  io.emit('Owner-accepted-Trip', {notification});
 
+
+  io.emit('Owner-accepted-Trip', {notification});
+  io.emit('trip-request-accepted', { tripData, notification, chatRoomId: tripData._id.toString() });
+  
   await notification.save();
       let message = tripNotification
   res.send({tripInformation,message})
