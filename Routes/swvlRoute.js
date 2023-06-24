@@ -66,7 +66,7 @@ route.post('/AddTrip', async (req, res) => {
       port:req.body.port,
       targetPlace:req.body.targetPlace,
       date:req.body.date,
-      availableSeats:boat.numberOfpeople,
+      availableSeats:20,
       priceForTrip: req.body.priceForTrip,
     });
 
@@ -81,7 +81,9 @@ route.post('/AddTrip', async (req, res) => {
 
 // Get Trip By Id 
 route.get('/swvlTrip/:swvlId', async (req, res) => {
+  console.log(req.params.swvlId)
   const swvl = await Swvl.findById(req.params.swvlId).populate("boat");
+  console.log(swvl)
   res.send(swvl)
 });
 
