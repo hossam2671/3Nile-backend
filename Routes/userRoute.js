@@ -157,6 +157,7 @@ route.get("/boats", async (req, res) => {
 });
 // Get notifications
 route.get("/notifications/:id", async (req, res) => {
+  console.log(req.params.id);
   try {
     const allNotifications = await Notification.find({ clientId: req.params.id });
     const readNotifications = allNotifications.filter(notification => notification.status === "read");

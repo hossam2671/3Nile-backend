@@ -702,50 +702,16 @@ route.put('/acceptTrip', async (req, res) => {
    status:'unRead'
   });
   const chatRoomId = tripData._id.toString()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-  // manually add the client ID to the room
-  let clientsInRoom = io.sockets.adapter.rooms.get(chatRoomId);
-  if (!clientsInRoom) {
-    clientsInRoom = new Set();
-    io.sockets.adapter.rooms.set(chatRoomId, clientsInRoom);
-  }
-  clientsInRoom.add(tripData.boatOwnerId);
-
-
-console.log(clientsInRoom,"clientsInRoomclientsInRoomclientsInRoom")
+  const owner = await boatOwner.find({boat:tripData.boatId })
+  const userData = await user.find({_id:tripData.clientId} )
   io.emit('Owner-accepted-Trip', {notification});
-  io.emit('trip-request-accepted', { tripData, notification, chatRoomId: tripData._id.toString() });
+  io.emit('trip-request-accepted', { tripData,owner,userData, notification, chatRoomId: tripData._id.toString() });
   io.emit('join_room', chatRoomId)
   io.to(chatRoomId).emit('join_room', chatRoomId);
   await notification.save();
       let message = tripNotification
   res.send({tripInformation,message})
 })    
-
-
-
-// 
-
-
-
-
-
-
-
 
 // Owner finish Trip
 route.put('/finishTrip', async (req, res) => {
