@@ -688,7 +688,11 @@ route.put('/acceptTrip', async (req, res) => {
     status: "accepted"
   })
   const tripInformation = await trips.findById(req.body.id )
-
+  // هبعت اوبجيكت الاونر هنا مع النوتيفيكيشنز وألوب عليها واعرض كل الاونرز علىا الشمال
+  // ولما يدوس علىواحد فيهم يدخله روم معاه 
+  // هعمل فيند للتريب اللي حالتها شغاله دلوقتي واجيب الاونر بتاع البووت وبعدها 
+  // هعمله ديسباتش 
+  // ولما يدوس على صورة الاونر ده يفتح بينهم رووم 
 
  let tripNotification = "The Trip accepted Now " 
  const notification = new Notification({
@@ -697,11 +701,36 @@ route.put('/acceptTrip', async (req, res) => {
    createdAt:Date.now() ,
    status:'unRead'
   });
+  const chatRoomId = tripData._id.toString()
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+  // manually add the client ID to the room
+  let clientsInRoom = io.sockets.adapter.rooms.get(chatRoomId);
+  if (!clientsInRoom) {
+    clientsInRoom = new Set();
+    io.sockets.adapter.rooms.set(chatRoomId, clientsInRoom);
+  }
+  clientsInRoom.add(tripData.boatOwnerId);
+
+
+console.log(clientsInRoom,"clientsInRoomclientsInRoomclientsInRoom")
   io.emit('Owner-accepted-Trip', {notification});
   io.emit('trip-request-accepted', { tripData, notification, chatRoomId: tripData._id.toString() });
-  
+  io.emit('join_room', chatRoomId)
+  io.to(chatRoomId).emit('join_room', chatRoomId);
   await notification.save();
       let message = tripNotification
   res.send({tripInformation,message})
