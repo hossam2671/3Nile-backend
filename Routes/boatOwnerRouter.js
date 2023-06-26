@@ -688,11 +688,6 @@ route.put('/acceptTrip', async (req, res) => {
     status: "accepted"
   })
   const tripInformation = await trips.findById(req.body.id )
-  // هبعت اوبجيكت الاونر هنا مع النوتيفيكيشنز وألوب عليها واعرض كل الاونرز علىا الشمال
-  // ولما يدوس علىواحد فيهم يدخله روم معاه 
-  // هعمل فيند للتريب اللي حالتها شغاله دلوقتي واجيب الاونر بتاع البووت وبعدها 
-  // هعمله ديسباتش 
-  // ولما يدوس على صورة الاونر ده يفتح بينهم رووم 
 
  let tripNotification = "The Trip accepted Now " 
  const notification = new Notification({

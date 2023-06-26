@@ -17,6 +17,7 @@ const boats = require("./Models/boat");
 const trips = require("./Models/trip");
 const review = require("./Models/review");
 // Call Routes : 
+const ObjectId = require("mongodb").ObjectId;
 
 const userRoute=require('./Routes/userRoute')
 const boatOwnerRoute=require('./Routes/boatOwnerRouter')
@@ -211,7 +212,82 @@ app.post("/register", async function (req, res) {
   });
 
 
+// Chatting  
 
+
+// app.post('/chat', async (req, res) => {
+//   const chatRoomId = req.body.chatRoomId;
+//   const sender = req.body.sender;
+//   const message = req.body.message;
+
+//   const chat = new chatSchema({ chatRoomId, sender, message });
+
+//   await chat.save();
+
+//   io.to(chatRoomId).emit('message', { chatRoomId, sender, message });
+
+//   res.send({ chat });
+// });
+app.put('/chatMessage', async (req, res) => {
+  console.log(req.body,"ssssssssssssssss");
+  const TripId = req.body.TripId;
+  const sender = req.body.sender;
+  const senderMessage = req.body.message;
+  const messageTime = req.body.time;
+  const trip = await trips.findById(TripId)
+  const client = trip.clientId
+  const owner =await boatOwner.find({boat:trip.boatId})
+  const ownerId =owner
+  // Ifssss
+  let id=new ObjectId( sender)
+
+
+  console.log(id);
+  console.log(ownerId[0]._id);
+  if(client.toString()===id.toString()){
+        console.log(senderMessage,messageTime,"done");
+
+
+
+    const tripData = await trips.findByIdAndUpdate(TripId, {
+      $push: { userMessages:{ 
+        message:senderMessage,
+       time:messageTime
+      
+      }
+    
+    }
+  }, { new: true })
+  res.send( tripData ); 
+
+  }
+
+  else if (ownerId[0]._id.toString() === id.toString()){
+    const tripData = await trips.findByIdAndUpdate(TripId, {
+      $push: { boatOwnerMessages:{ 
+        message:senderMessage,
+       time:messageTime
+      
+      }},  
+    })
+    res.send( tripData );
+  }
+  else{
+    console.log("dosnt match");
+  }
+
+});
+
+app.get('/chatMessage/:id',async(req,res)=>{
+  console.log(req.params.id);
+  const trip = await trips.findById(req.params.id)
+  const userMessages = trip.userMessages
+  const boatOwnerMessages = trip.boatOwnerMessages
+  res.send({userMessages,boatOwnerMessages})
+
+})
+
+// Chatting End  
   io.on("connection", (socket) => {
     socket.on("join_room", (data) => {
       socket.join(data);

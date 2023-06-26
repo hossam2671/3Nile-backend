@@ -131,7 +131,7 @@ route.put('/editImage/:id',upload.single('img'),async function (req,res){
 // edit user info 
 
 route.put("/editUserinfo/:id",
-  // upload.single("img"),
+  upload.single("img"),
   async function (req, res) {
     console.log("dddd")
   let data ;
@@ -139,9 +139,9 @@ route.put("/editUserinfo/:id",
     console.log(req.params.id)
     let editUserinfo = await user.findByIdAndUpdate(req.params.id, {
       name: req.body.name,
-      // address:req.body.address,
+      address:req.body.address,
       phone:req.body.phone,
-      //  img: req.file.filename,
+       img: req.file.filename,
     }).then((res)=>{
       console.log(res,"dsada");
       data= res

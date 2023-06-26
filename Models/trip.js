@@ -18,6 +18,31 @@ const tripSchema = mongoose.Schema({
   hours: {
     type: Number,
   },
+  userMessages: [
+    {
+      message: {
+        type: String, 
+        required: true
+      },
+      time: {
+        type: Date,
+        required: true
+      }
+    }
+  ],
+  boatOwnerMessages: [
+    {
+      message: {
+        type: String, 
+        required: true
+      },
+      time: {
+        type: Date,
+        required: true
+      }
+    }
+  ]
+  ,
   date: {
     type: Date,
   },
