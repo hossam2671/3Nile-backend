@@ -1,7 +1,7 @@
 const express = require("express");
 const  io  = require('../Socket').get();
 const route = express.Router();
-const user = require("../Models/client");
+const users = require("../Models/client");
 const boats = require("../Models/boat");
 const trips = require("../Models/trip");
 const boatOwner = require("../Models/boatOwner");
@@ -9,6 +9,10 @@ const reviews = require("../Models/review");
 const Comments = require("../Models/userComments");
 const mongoose = require('mongoose');
 const { ObjectId } = require('mongoose').Types;
+const sizeOf = require('image-size');
+const sharp = require('sharp');
+const mime = require('mime-types');
+
 const cookieParser = require("cookie-parser");
 const cors = require("cors")
 const jwt = require("jsonwebtoken");
@@ -40,7 +44,7 @@ route.use(cookieParser());
 // Register :
 route.post("/register", async function (req, res) {
 console.log(req.body)
-  let exist = await user.findOne({ email: req.body.email })
+  let exist = await users.findOne({ email: req.body.email })
   let existOwner = await boatOwner.findOne({ email: req.body.email })
 
   console.log(exist);
@@ -54,7 +58,7 @@ console.log(req.body)
   }else{
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
   req.body.password = hashedPassword;
-  let userData = await user.create({
+  let userData = await users.create({
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
@@ -82,7 +86,7 @@ console.log(req.body)
 // Log In :
 route.post("/login", async (req, res) => {
   try {
-    const userData = await user.findOne({ email: req.body.email });
+    const userData = await users.findOne({ email: req.body.email });
     if (!userData) {
       res.json({
         message: "Error:invalid credentials , No account found",
@@ -121,13 +125,21 @@ route.post("/login", async (req, res) => {
 //edit user image mobile
 route.put('/editImage/:id',upload.single('img'),async function (req,res){
   console.log(req.file)
-  const userData = await user.findByIdAndUpdate(req.params.id,{
+  const userData = await users.findByIdAndUpdate(req.params.id,{
     img:req.file.filename
   })
   console.log("first")
   res.send(userData)
 })
 
+
+// Find User By ID 
+
+
+route.get("/userInfo/:id", async (req, res) => {
+  const userData = await users.findById(req.params.id);
+  res.send(userData);
+});
 // edit user info 
 
 route.put("/editUserinfo/:id",
@@ -137,18 +149,87 @@ route.put("/editUserinfo/:id",
   let data ;
     console.log(req.body,"BODY")
     console.log(req.params.id)
-    let editUserinfo = await user.findByIdAndUpdate(req.params.id, {
+    let editUserinfo = await users.findByIdAndUpdate(req.params.id, {
       name: req.body.name,
       address:req.body.address,
       phone:req.body.phone,
-       img: req.file.filename,
+       img: req?.file?.filename,
     }).then((res)=>{
       console.log(res,"dsada");
       data= res
     })
-    let usery = await user.findById(req.params.id)
+    let usery = await users.findById(req.params.id)
+    console.log(usery)
     res.send(usery);
   });
+
+
+  // User cover 
+
+
+
+
+  route.put('/userCover/:id', upload.single('img'), async function (req, res) {
+    console.log(req.file);
+    const userID = req.params.id;
+    if (!req.file||req.file===undefined) {
+      
+      res.json({
+              message: `Invalid image ,Try Again`,
+              status: 400,
+              success: false,
+            }); 
+    }else{
+  
+    
+    const imageDimensions = sizeOf(req.file.path);
+    const imageWidth = imageDimensions.width;
+    const requiredWidth = 1000; 
+     if (!req.file.mimetype.startsWith('image/')) {
+          res.json({
+            message: "Invalid Image Type",
+            status: 400,
+            success: false,
+          }); 
+      
+        }
+        
+    else if (imageWidth < requiredWidth) {
+      console.log(`Invalid image width. Required width: ${requiredWidth}`)
+      res.json({
+              message: `Invalid image width. Required width: ${requiredWidth}`,
+              status: 400,
+              success: false,
+            }); 
+    }
+   
+  else{
+    
+    const userUpdate= await users.findByIdAndUpdate(
+      userID,
+      {
+        coverImg: req.file.filename
+      }
+      );
+      
+        const userData = await users.findById(userID)
+
+          let user = "user";
+          res.json({
+            message: `your Cover Has Been Updated`,
+            status: 200,
+            data:{ userData, user },
+            success: false,
+          })
+
+      
+    }
+  }
+    });
+      
+      
+
+  // User Cover End 
 
 //get all boats
 route.get("/boats", async (req, res) => {

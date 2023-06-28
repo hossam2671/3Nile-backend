@@ -28,6 +28,10 @@ const clientschema=mongoose.Schema({
         type: String,
         default: 'pro.png',
     },
+    coverImg:{
+        type:String,
+        default:"ownerCoverDefault.png"
+    },
     passwod:{
         type:"string",
         // require:true,
