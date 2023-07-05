@@ -552,8 +552,13 @@ route.get('/userTrips/accepted/:id', async (req, res) => {
   const userTrips = await trips.find({$and:[ {clientId:id},{ status: "accepted"}] }).populate("boatId").populate("rate")
   res.send(userTrips)
 })
-
-
+// Get Owner Chat Data 
+route.get('/userTrip/:id', async (req, res) => {
+  let id=new ObjectId( req.params.id)
+  const userTrip = await trips.findById(id)
+  const ownerData = await boatOwner.find({boat:userTrip.boatId})
+  res.send({ownerData,userTrip})
+})
 
 // Create a new review
 route.post("/addReview", async (req, res) => {

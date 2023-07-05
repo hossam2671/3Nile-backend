@@ -242,7 +242,7 @@ app.put('/chatMessage', async (req, res) => {
   let id=new ObjectId( sender)
 
 
-  console.log(id);
+  console.log(id,"sender");
   console.log(ownerId[0]._id);
   if(client.toString()===id.toString()){
         console.log(senderMessage,messageTime,"done");
@@ -295,16 +295,16 @@ app.get('/chatMessage/:id',async(req,res)=>{
     })
   
     socket.on("send_message", (data) => {
-      console.log(data,"ddddddddddd");
-      socket.to(data.room).emit("receive_message", data);
+      console.log(data, "ddddddddddd");
+      socket.broadcast.to(data.room).emit("receive_message", data);
     });
+    
   
     socket.on("disconnect", () => {
       console.log("User Disconnected", socket.id);
     });
 
-    // هنا الدنيا تمام 
-    //  فاضل اننا ندل الاونر الرووم 
+   
   });
 
 
