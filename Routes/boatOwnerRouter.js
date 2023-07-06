@@ -143,6 +143,19 @@ route.put('/editImage/:id',upload.single('img'),async function (req,res){
 
 })
 
+//edit owner cover image mobile 
+route.put('/editCover/:id',upload.single('img'),async function (req,res){
+  console.log("fatma gamila w hoso w7esh")
+  console.log(req)
+  console.log(req.file,"jgjkk")
+  const boatOwnerData = await boatOwner.findByIdAndUpdate(req.params.id,{
+    coverImg:req.file.filename
+  })
+  console.log("first")
+  res.send(boatOwnerData)
+
+})
+
 // edit owner info
 
 
@@ -301,6 +314,8 @@ else{
   }
 }
   });
+
+  
     
     
     
@@ -459,10 +474,9 @@ upload.array("images", 9),
          type: req.body.type,
          category:category,
          images: multiimages,
-        //numberOfpeople: req.body.number,
+        numberOfpeople: req.body.numberOfpeople,
       });
        // let boatOwnerId = req.cookies.boatOwnerId
-    //   // let boatOwnerId = '646d225031823a799fb95c7b';
        let boatOwnerData = await boatOwner.findByIdAndUpdate(req.body.id, {
         $push: { boat: boatData._id },
        });

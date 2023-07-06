@@ -132,6 +132,17 @@ route.put('/editImage/:id',upload.single('img'),async function (req,res){
   res.send(userData)
 })
 
+//edit user cover image mobile 
+route.put('/editCover/:id',upload.single('img'),async function (req,res){
+  console.log(req)
+  console.log(req.file,"jgjkk")
+  const userData = await users.findByIdAndUpdate(req.params.id,{
+    coverImg:req.file.filename
+  })
+  console.log("first")
+  res.send(userData)
+})
+
 
 // Find User By ID 
 
