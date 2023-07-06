@@ -28,7 +28,7 @@ const ownerSchema = mongoose.Schema({
     },
     coverImg:{
         type:String,
-        default:"ownerCoverDefault.png"
+        default:"cover.jpg"
     },
     boat:
         [

@@ -151,6 +151,15 @@ route.get("/userInfo/:id", async (req, res) => {
   const userData = await users.findById(req.params.id);
   res.send(userData);
 });
+
+// Find User By Id And Send Identical Obj 
+route.get("/userInfoIdentical/:id", async (req, res) => {
+  console.log(req.params)
+  const userData = await users.findById(req.params.id);
+  console.log(userData,"doneeeeeeeeeeeeeeeeeee")
+  let user = 'user'
+  res.send({userData,user});
+});
 // edit user info 
 
 route.put("/editUserinfo/:id",
