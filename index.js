@@ -177,6 +177,61 @@ app.post("/login", async (req, res) => {
     }); 
   }
 });
+app.post("/fireBaseLogin", async (req, res) => {
+  console.log(req.body,"from firebase")
+          let userData;
+           userData = await user.findOne({ email: req.body.email });
+           if (!userData) {
+          console.log("not found user")
+          const hashedPassword = await bcrypt.hash(req.body.password, 10);
+          req.body.password = hashedPassword;
+          let newUser = await user.create({
+          name: req.body.name,
+          email: req.body.email,
+          password: req.body.password,
+          });
+          console.log( req.body.password)
+          let userr = 'user'
+          userData = newUser
+          res.json({
+            message: "Registered With FireBase Account",
+            status: 200,
+            data:{userData,userr},
+            success: true,
+          }); 
+        } else {
+            console.log("found user")
+            console.log(userData.password,"s")
+          const isValidPassword = await bcrypt.compare(
+            req.body.password,
+            userData.password
+          );
+            if(isValidPassword){
+
+              console.log("password correct")
+            if(userData.status!=="blocked"){
+              const token = jwt.sign({ user: userData._id }, "3-nile");
+              // Set The Id In Cookie With Encryption
+              res.cookie("userId", token, { maxAge: 900000, httpOnly: true });
+              let user = 'user'
+              res.send({userData,user});
+            }
+            else{
+              let user = 'user'
+              res.json({
+                message: "Sorry , You Were Blocked ",
+                status: 401,
+                data: {userData,user},
+                success: false,
+              }); 
+            }
+          }
+          
+          
+        }
+  
+  
+});
 
 app.post('/addTrip', async (req, res) => {
   // res.send(req.cookies)

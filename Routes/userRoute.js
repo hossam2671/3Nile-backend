@@ -547,6 +547,15 @@ route.get('/userTrips', async (req, res) => {
   const userTrips = await trips.find({ clienId: id })
   res.send(userTrips)
 })
+route.get('/userTripData/:id', async (req, res) => {
+  let id = req.params.id
+  console.log(id)
+  
+  const userTripData = await trips.findById(id)
+  console.log(userTripData,"userTripData")
+
+  res.send(userTripData)
+})
 // get all user finished trips
 
 route.get('/userTrips/finished/:id', async (req, res) => {
