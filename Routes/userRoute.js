@@ -65,8 +65,9 @@ console.log(req.body)
   //   // 'img':req.body.img
   });
   console.log(userData);
+  io.emit('New User-registerd')
   res.json({
-    message: "Successfull regestration go to sign-in",
+    message: "Successfull registration go to sign-in",
     status: 200,
     // data: userData,
     success: true,
