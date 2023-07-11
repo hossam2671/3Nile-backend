@@ -602,6 +602,7 @@ route.post("/addReview", async (req, res) => {
       rating: req.body.rating,
       // comment: req.body.comment,
     });
+    io.emit("user Rate")
     const tripData = await trips.findByIdAndUpdate(req.body.tripId,{rate:review._id})
     res.status(201).send(review);
 
@@ -704,7 +705,7 @@ route.post('/contactUs', async (req, res) => {
     console.log(message);
     const userMassage = await Comments.findById(message._id)
     if(userMassage){
-
+        io.emit("user Comment")
       let message = 'You Message sent successfully!'
       res.json({
         message: "You Message sent successfully!",
