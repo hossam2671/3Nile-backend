@@ -65,9 +65,10 @@ console.log(req.body)
   //   // 'img':req.body.img
   });
   console.log(userData);
-  io.emit('New User-registerd')
+  let numbers = await users.countDocuments();
+  io.emit('New User-registerd',numbers)
   res.json({
-    message: "Successfull registration go to sign-in",
+    message: "Successfull registration, go to sign-in",
     status: 200,
     // data: userData,
     success: true,
