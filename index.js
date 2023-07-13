@@ -255,6 +255,9 @@ app.post('/addTrip', async (req, res) => {
 // 
 
 app.post("/register", async function (req, res) {
+  console.log(req.body,"sxc")
+  const hashedPassword = await bcrypt.hash(req.body.password, 10);
+  req.body.password = hashedPassword;
     let ownerData = await boatOwner.create({
       name: req.body.name,
       email: req.body.email,
